@@ -1,0 +1,341 @@
+function showMappingVisualization(data, name, show) {
+    if (data) {
+        $('#mapName').html('<p><b>' + name + '</b></p>');
+        if (show) {
+            $('#show-canvas').show();
+            $('#dont-canvas').hide();
+            start_sidebar_with_notes(data, name, 'show-mapping-sidebar');
+            start_canvas_with_nodes(data, name);
+        }
+        else {
+            $('#show-canvas').hide();
+            $('#dont-canvas').show();
+            start_sidebar_with_notes(data, name, 'dont-mapping-sidebar');
+        }
+    } else {
+        console.log('no notes, yo');
+    }
+}
+
+(function() {
+  var COLOR, HEIGHT, MAX_HOVER, Node, WIDTH, add_node, advance_offset_target, bind_click_events, clear_screen, currentTargetNode, draw, find_node_by_coordinates, initialize_canvas, initialized_canvas, nodes, target_x_offset, target_y_offset, x_offset, y_offset;
+  HEIGHT = 550;
+  WIDTH = 770;
+  MAX_HOVER = 50;
+//   x_offset = 400;
+//   y_offset = 200;
+  x_offset = WIDTH / 2;
+  y_offset = HEIGHT / 2;
+//   target_x_offset = 400;
+//   target_y_offset = 200;
+  target_x_offset = x_offset;
+  target_y_offset = y_offset;
+  currentTargetNode = null;
+  nodes = [];
+  initialized_canvas = false;
+  maxTextWidth = 200;
+  COLOR = {
+    background: "#FFF",
+    node: "#CCC"
+  };
+  State = (function() {
+      function State() {
+          var canvasState = this;
+          this.valid = false;
+          this.dragging = false;
+          this.selection = null;
+          this.dragoff_x = 0;
+          this.dragoff_y = 0;
+          this.selectionColor = '#CC0000';
+          this.selectionWidth = 2;
+          this.drawInterval = 30; //ms
+          setInterval(function() {canvasState.draw();}, canvasState.drawInterval);
+
+          //Related to double clicking causing text to select
+          canvas.addEventListener('selectstart', function(e) {e.preventDefault(); return false;}, false);
+          //Dragging
+          canvas.addEventListener('mousedown', function(e) {
+              var mouse = canvasState.getMouse(e);
+              for (var i = nodes.length-1; i>=0; i--) {
+                  if (nodes[i].contains(mouse.x, mouse.y)) {
+                      var selection = nodes[i]
+                      canvasState.dragoff_x = mouse.x - selection.x;
+                      canvasState.dragoff_y = mouse.y - selection.y;
+                      canvasState.dragging = true;
+                      canvasState.selection = selection;
+                      canvasstate.valid = false;
+                      return;
+                  }
+              }
+              if (canvasState.selection) {
+                  canvasState.selection = null;
+                  canvasState.valid = false;
+              }
+          }, true);
+          canvas.addEventListener('mousemove', function(e) {
+              if (canvasState.draggin) {
+                  var mouse = canvasState.getMouse(e);
+                  canvasState.selection.x = mouse.x - canvasState.dragoff_x;
+                  canvasState.selection.y = mouse.y - canvasState.dragoff_y;
+                  canvasState.valid = false;
+              }
+          }, true);
+          canvas.addEventListener('mouseup', function(e) {
+              canvasState.dragging = false;
+          }, true);
+      }
+      State.prototype.draw = function() {
+          if (!this.valid) {
+              var ctx = this.ctx;
+              this.clear();
+
+              for (var i = 0; i < nodes.length; i++) {
+                  var node = nodes[i];
+                  if (node.x > this.width || node.y > this.height ||
+                      node.x + node.w < 0 || node.y + node.h < 0) {continue;}
+                  node.draw(ctx);
+              }
+
+              if (this.selection != null) {
+                  ctx.strokeStyle = this.selectionColor;
+                  ctx.lineWidth = this.selectionWidth;
+                  ctx.strokeRect(this.selection.x, this.selection.y, this.selection.w, this.selection.h);
+              }
+
+              this.valid = true;
+          }
+      };
+      return State;
+  })();
+  Node = (function() {
+    function Node(x, y, name, size) {
+      this.x = x;
+      this.y = y;
+      this.name = name;
+      this.connections = [];
+      this.size = size;
+      this.hover_x = 0;
+      this.hover_y = 0;
+    }
+    Node.prototype.draw = function(ctx, color) {
+      var connection, nameTextBox, textWidth, this_x, this_y, _i, _len, _ref;
+      if (color == null) {
+        color = COLOR.node;
+      }
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
+      this_x = this.x + x_offset - (this.size / 2) + this.hover_x;
+      this_y = this.y + y_offset - (this.size / 2) + this.hover_y;
+      ctx.fillRect(this_x, this_y, this.size, this.size);
+      ctx.font = "bold 12px sans-serif";
+      nameTextBox = fitString(ctx, this.name, maxTextWidth);
+      textWidth = ctx.measureText(nameTextBox[0]).width;
+      for (var i = 0; i < nameTextBox.length; i++) {
+          ctx.fillText(nameTextBox[i], this_x - textWidth/2, this_y + 15*(i+1) + this.size);
+      }
+      _ref = this.connections;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        connection = _ref[_i];
+        ctx.beginPath();
+        ctx.moveTo(this.x + x_offset + this.hover_x, this.y + y_offset + this.hover_y);
+        ctx.lineTo(connection.x + x_offset + connection.hover_x, connection.y + y_offset + connection.hover_y);
+        ctx.stroke();
+      }
+      return this.hover();
+    };
+    Node.prototype.hover = function() {
+      this.hover_x += Math.random() - 0.5;
+      if (this.hover_x > MAX_HOVER) {
+        this.hover_x = MAX_HOVER;
+      }
+      if (this.hover_x < 0) {
+        this.hover_x = 0;
+      }
+      this.hover_y += Math.random() - 0.5;
+      if (this.hover_y > MAX_HOVER) {
+        this.hover_y = MAX_HOVER;
+      }
+      if (this.hover_y < 0) {
+        return this.hover_y = 0;
+      }
+    };
+    return Node;
+  })();
+  fitString = function(ctx, str, widthMax) {
+      var textBlock = [];
+      var words = str.split(" ");
+      var position = 0;
+      while (position < words.length) {
+          var sentence = words[position];
+          position += 1;
+          while (position < words.length && checkStrLength(ctx, sentence, words[position], widthMax)) {
+              sentence += " ";
+              sentence += words[position];
+              position += 1;
+          }
+          textBlock.push(sentence);
+      }
+      return textBlock;
+  };
+  checkStrLength = function(ctx, str, word, max) {
+      if (ctx) {return (ctx.measureText(str + word).width + 1 <= max)}
+      else {return ((str + word).length + 1 <= max)}
+  };
+  clear_screen = function(ctx) {
+    ctx.fillStyle = COLOR.background;
+    return ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  };
+  advance_offset_target = function() {
+    x_offset += (target_x_offset - x_offset) * 0.05;
+    return y_offset += (target_y_offset - y_offset) * 0.05;
+  };
+  draw = function(ctx) {
+    var node, _i, _j, _len, _len2, _ref, _results;
+    clear_screen(ctx);
+    advance_offset_target();
+    for (_i = 0, _len = nodes.length; _i < _len; _i++) {
+      node = nodes[_i];
+      node.draw(ctx);
+    }
+    if (currentTargetNode !== null) {
+      currentTargetNode.draw(ctx, "000");
+      _ref = currentTargetNode.connections;
+      _results = [];
+      for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
+        node = _ref[_j];
+        _results.push(node.draw(ctx, "000"));
+      }
+      return _results;
+    }
+  };
+  add_node = function(root_node, connections_and_radii) {
+    var RADIUS, angle, connection, highestRadii, lowestRadii, lowestNotes, highestNotes, i, url_node, node, num_similar, radii, this_x, this_y, this_size, _i, _j, _k, _len, _len2, _len3;
+    RADIUS = 200;
+    num_similar = connections_and_radii.length;
+    angle = 2 * Math.PI / num_similar;
+    i = 0;
+    lowestRadii = 1000;
+    lowestNotes = 1000;
+    highestRadii = -1;
+    highestNotes = -1;
+    for (_i = 0, _len = connections_and_radii.length; _i < _len; _i++) {
+      url_node = connections_and_radii[_i];
+      if (lowestRadii > url_node.radii) {
+          lowestRadii = url_node.radii;
+      }
+      if (lowestNotes > url_node.notes.length) {
+          lowestNotes = url_node.notes.length;
+      }
+      if (highestRadii < url_node.radii) {
+          highestRadii = url_node.radii;
+      }
+      if (highestNotes < url_node.notes.length) {
+          highestNotes = url_node.notes.length;
+      }
+    }
+    for (_k = 0, _len3 = connections_and_radii.length; _k < _len3; _k++) {
+      url_node = connections_and_radii[_k];
+      RADIUS = (1.00001 - ((url_node.radii - lowestRadii) / (highestRadii - lowestRadii))) * 120 + 100;
+      this_size = 8 + 15*((url_node.notes.length - lowestNotes) / (highestNotes - lowestNotes));
+      this_x = Math.cos(angle * i) * RADIUS + root_node.x;
+      this_y = Math.sin(angle * i) * RADIUS + root_node.y;
+      node = new Node(this_x, this_y, url_node.title, this_size);
+      root_node.connections.push(node);
+      nodes.push(node);
+      i += 1;
+    }
+    return root_node;
+  };
+  find_node_by_coordinates = function(x, y) {
+    var node, nx, ny, _i, _len;
+    for (_i = 0, _len = nodes.length; _i < _len; _i++) {
+      node = nodes[_i];
+      nx = node.x + x_offset + node.hover_x - node.size / 2;
+      ny = node.y + y_offset + node.hover_y - node.size / 2;
+      if (nx < x && nx + node.size > x && ny < y && ny + node.size > y) {
+        return node;
+      }
+    }
+    return null;
+  };
+  bind_click_events = function() {
+    return $('canvas').click(function(event) {
+      var connections, node;
+      node = find_node_by_coordinates(event.offsetX, event.offsetY);
+      if (node) {
+          //Should show the notes for just this one on the right.
+        currentTargetNode = node;
+//         connections = getConnectionsFor(node.name, true);
+//         add_node(node, connections);
+        target_x_offset = (-1 * node.x) + WIDTH / 2;
+        return target_y_offset = (-1 * node.y) + HEIGHT / 2;
+      }
+    });
+  };
+  initialize_canvas = function() {
+    var canvas, ctx;
+    canvas = $('#mapping-canvas');
+    canvas.attr('width', $('#div-canvas').width());
+    canvas.attr('height', $('#div-canvas').height());
+    ctx = canvas.getContext("2d");
+    return setInterval(function() {
+      return draw(ctx);
+    }, 10);
+  };
+  resize_canvas = function() {
+      var canvas = $('#mapping-canvas');
+      var div_canvas = $('#div-canvas');
+      canvas.attr('width', $('#div-canvas').width());
+      canvas.attr('height', $('#div-canvas').height());
+      draw(canvas.getContext("2d"));
+  };
+  window.start_canvas_with_nodes = function(connected_notes_and_radii, mapping) {
+    var root_node, this_x, this_y;
+    if (!initialized_canvas) {
+      initialize_canvas();
+    }
+    nodes = [];
+    this_x = 0;
+    this_y = 0;
+    this_size = 10; //default size
+    root_node = new Node(this_x, this_y, mapping, this_size);
+    nodes.push(root_node);
+    target_x_offset = 400;
+    target_y_offset = 200;
+    currentTargetNode = add_node(root_node, connected_notes_and_radii);
+    if (!initialized_canvas) {
+      bind_click_events();
+    }
+    window.addEventListener('resize', resize_canvas, false);
+    return initialized_canvas = true;
+  };
+  window.start_sidebar_with_notes = function(url_notes, mapping, sidebar_id) {
+    var sidebar = document.getElementById(sidebar_id);
+    for (var i = 0; i < url_notes.length; i++) {
+        var url = url_notes[i];
+        var title = document.createElement('div');
+        title.class = 'row-fluid';
+        title.innerHTML = '<a href="' + url.url + '"><p>' + url.title + '</p></a>';
+        sidebar.appendChild(title);
+
+        for (var j = 0; j < url.notes.length; j++) {
+            var rowfluid = document.createElement('div');
+            rowfluid.class = 'row-fluid';
+            var spanOne = document.createElement('div');
+            spanOne.class = 'span1';
+            var spanTen = document.createElement('div');
+            spanTen.class = 'span10 offset1';
+            rowfluid.appendChild(spanOne);
+            rowfluid.appendChild(spanTen);
+            title.appendChild(rowfluid);
+
+            var note = url.notes[j];
+            var date = new Date(note.time * 1000);
+//             var textBox = fitString(null, note.text, 50);
+            var text = note.text;
+            spanOne.innerHTML = '<p>' + date.getMonth() + '/' + date.getDate() + '/' + date.getFullYear() + '</p>';
+            spanTen.innerHTML = '<p>' + text + '</p>';
+        }
+    }
+  };
+}).call(this);

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<style>
+  #map-nav {
+    min-height:100px;
+    border: 1px solid;
+    margin-bottom: 20px;
+  }
+
+  #map-sites {
+    min-height:100px;
+    border: 1px solid;
+    margin-bottom: 20px;
+  }
+
+  #map-sandlot {
+    border: 1px solid;
+  }
+
+  .sidebar {
+    background-color:#dceaf4;
+    min-height:100px;
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row" id="mapName" style="margin-left:20px"></div>
+<div class="row" id="personName" style="margin-left:40px"><p>by first name last name</p></div>
+<hr>
+<div class="container-fluid">
+  {% if mapping %}
+  <div class="row-fluid" id="show-canvas">
+    <div class="span4">
+      <div class="container-fluid">
+        <div class="row-fluid sidebar" id="map-nav"></div>
+        <div class="row-fluid sidebar" id="map-notes"></div>
+      </div>
+    </div>
+    <div class="span8">
+      <div class="container-fluid">
+        <div class="row-fluid" id="map-sites"></div>
+        <div class="row-fluid" id="map-sandlot"></div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{%  block footer %}
+{{ super() }}
+<script src="/static/js/d3.v3.js"></script>
+<script src="/static/js/user_mapping.js" onload="showMappingVisualization({{mapping}}, {{show_canvas}})"></script>
+{% endblock %}

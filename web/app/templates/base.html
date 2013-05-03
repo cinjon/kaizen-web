@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% block head %}
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if title %}
+    <title>{{title}}</title>
+    {% else %}
+    <title>Kaizen</title>
+    {% endif %}
+    {% endblock %}
+  </head>
+  <body>
+    <div class="container">
+      <div class="navbar">
+        <div class="navbar-inner" style="background-color:#dceaf4">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="{{ url_for('index') }}">Kaizen</a>
+          {% if g.user %}
+          <ul class="nav">
+            <li><a href="{{ url_for('user_profile_owner', name=g.user.name) }}">{{g.user.first}} {{g.user.last}}</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="span12">
+          {% block content %}{% endblock %}
+        </div>
+      </div>
+    </div>
+  </body>
+  <footer>
+    <hr>
+    {% block footer %}{% endblock %}
+  </footer>
+</html>

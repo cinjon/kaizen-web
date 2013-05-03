@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{user.first}} {{user.last}}</h1>
+<hr>
+<div class="row">
+  <div class="span2"><p>Binding</p></div>
+  <div class="span8"><p>Map Name</p></div>
+  <div class="span2"><p>Notes</p></div>
+</div><br>
+{% for mapping in mappings %}
+<div class="row">
+  <div class="span2"><p>{{mapping.binding}}</p></div>
+  <div class="span8"><p><a href="{{ url_for('user_mapping', uname=user.name, mname=mapping.name) }}">{{mapping.name}}</a></p></div>
+  <div class="span2"><p>{{mapping.notes}}</p></div>
+</div><br />
+{% endfor %}
+{% endblock %}

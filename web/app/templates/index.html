@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<style>
+  div.formBox {
+    margin-bottom:10px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span3">
+    <div id="loginForm">
+      <div class="row-fluid">
+        <form class="form-horizontal" action="" method="post" name="post">
+          {{login_form.hidden_tag()}}
+          <div class="row-fluid formBox">
+            {{login_form.email(size=60, placeholder="Email")}}
+            {% for error in login_form.errors.email %}
+            <span style="color:red">[{{error}}]</span>
+            {% endfor %}
+          </div>
+          <div class="row-fluid formBox">
+            {{login_form.password(size=60, placeholder="Password")}}
+            {% for error in login_form.errors.password %}
+            <span style="color:red">[{{error}}]</span>
+            {% endfor %}
+          </div>
+          <div class="row-fluid formBox">
+            <div class="span1">
+              {{login_form.remember_me}}
+            </div>
+            <div class="span5" style="margin-top:2px">
+              <p>Remember Me</p>
+            </div>
+          </div>
+          <div class="row-fluid">
+            <div class="span2">
+              <input type="submit" id="loginSubmit" value="Sign In">
+            </div>
+            <div class="span2 offset2">
+              <input id="" type="button" value="I'm new." onclick="showRegistration()">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="registerForm" style="display:none">
+      <div class="row-fluid">
+        <form class="form-horizontal" action="" method="post" name="post">
+          {{register_form.hidden_tag()}}
+          <div class="row-fluid formBox">
+            {{register_form.first(size=60, placeholder="First")}}
+            {% for error in register_form.errors.first %}
+            <span style="color:red">[{{error}}]</span>
+            {% endfor %}
+          </div>
+          <div class="row-fluid formBox">
+            {{register_form.last(size=60, placeholder="Last")}}
+            {% for error in register_form.errors.last %}
+            <span style="color:red">[{{error}}]</span>
+            {% endfor %}
+          </div>
+          <div class="row-fluid formBox">
+            {{register_form.email(size=60, placeholder="Email")}}
+            {% for error in register_form.errors.email %}
+            <span style="color:red">[{{error}}]</span>
+            {% endfor %}
+          </div>
+          <div class="row-fluid formBox">
+            {{register_form.password(size=60, placeholder="Password")}}
+            {% for error in register_form.errors.password %}
+            <span style="color:red">[{{error}}]</span>
+            {% endfor %}
+          </div>
+          <div class="row-fluid">
+            <div class="span2">
+              <input type="submit" id="registerSubmit" value="Register">
+            </div>
+            <div class="span2 offset2">
+              <input id="" type="button" value="I'm old." onclick="showLogin()">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block footer %}
+{{ super() }}
+<script src="/static/js/index.js"></script>
+{% endblock %}
