@@ -26,6 +26,11 @@
 *.sql
 *.sqlite
 
+# VENV #
+########
+venv
+*.pyc
+
 # IDEA #
 ########
 *.idea
