@@ -19,11 +19,13 @@ class Mapping(db.Model):
         self.binding = binding
         sql.commit()
 
-    def add_note(self, data):
+    def add_note(self, data, keyCode):
         text = utility.decodeJS(data['text'])
         title = utility.decodeJS(data['title'])
         href = utility.decodeJS(data['href'])
-        note.create_note(text, title, href, self.id, int(data['keyCode']))
+        if 'ugn' in data: #TODO: userGeneratedNote
+            pass
+        note.create_note(text, title, href, self.id, keyCode)
 
     def get_all_notes(self):
         return [n for n in self.notes]

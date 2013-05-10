@@ -91,11 +91,20 @@ class User(db.Model):
         for m in self.mappings.filter(Mapping.binding == binding):
             m.set_binding(-1)
 
-    def add_note(self, keyCode, data):
-        m = self.mappings.filter(Mapping.binding == int(keyCode)).first()
+    def add_note(self, data):
+        keyCode = None
+        if 'keyCode' in data:
+            keyCode = int(data['keyCode'])
+            m = self.mappings.filter(Mapping.binding == keyCode).first()
+        elif 'mapping' in data:
+            keyCode = -1 #reps ~
+            m = self.mappings.filter(Mapping.name == data['mapping']).first()
+        else:
+            m = None
+
         if not m:
             return
-        m.add_note(data)
+        m.add_note(data, keyCode)
 
     def number_of_notes(self):
         return sum([len(m.notes.all()) for m in self.mappings])

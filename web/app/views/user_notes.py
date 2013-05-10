@@ -12,6 +12,5 @@ def user_notes(id):
 @login_required
 def xhr_notes():
     if request.is_xhr:
-        g.user.add_note(keyCode=request.form['keyCode'], data=request.form)
+        g.user.add_note(data=request.form)
         return utility.xhr_201(True)
-
