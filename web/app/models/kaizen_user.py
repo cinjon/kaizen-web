@@ -63,7 +63,8 @@ class KaizenUser(db.Model, UserMixin):
         return utility.generate_hash(password)
 
     def check_password(self, password):
-        return utility.check_hash(self.password, password)
+        return self.password == password
+        # return utility.check_hash(self.password, password)
 
     def get_current_mappings(self):
         return self.mappings.filter(Mapping.binding > -1).order_by(Mapping.binding)
