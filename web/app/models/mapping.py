@@ -1,17 +1,14 @@
 from app import db
 from app import utility
 import sql
-import user
 import note
-import site
 from sqlalchemy import and_
-import operator
 
 class Mapping(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     creation_time = db.Column(db.DateTime)
     name = db.Column(db.String(120))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+    kaizen_user_id = db.Column(db.Integer, db.ForeignKey('kaizen_user.id'), index=True)
     binding = db.Column(db.SmallInteger)
     notes = db.relationship('Note', backref='mapping', lazy='dynamic')
 
@@ -34,17 +31,17 @@ class Mapping(db.Model):
         sites = set([n.site for n in self.notes])
         return list(sites)
 
-    def __init__(self, name, user_id, binding):
+    def __init__(self, name, kaizen_user_id, binding):
         self.name = name
-        self.user_id = user_id
+        self.kaizen_user_id = kaizen_user_id
         self.binding = binding
         self.creation_time = utility.get_time()
 
     def __repr__(self):
         return self.name
 
-def create_mapping(user_id, name, binding=-1):
-    mapping = Mapping(name=name, binding=binding, user_id=user_id)
+def create_mapping(kaizen_user_id, name, binding=-1):
+    mapping = Mapping(name=name, binding=binding, kaizen_user_id=kaizen_user_id)
     sql.add(mapping)
     return mapping
 
@@ -57,7 +54,7 @@ def json_mappings(maps):
     return ret
 
 def mapping_with_userid_and_name(uid, name):
-    filtered = Mapping.query.filter(and_(Mapping.name==name, Mapping.user_id==uid)).all()
+    filtered = Mapping.query.filter(and_(Mapping.name==name, Mapping.kaizen_user_id==uid)).all()
     if len(filtered) == 1:
         return filtered[0]
     return None

@@ -1,5 +1,5 @@
 from app import flask_app
-from app.models import user
+from app.models import kaizen_user
 from flask import g, render_template, redirect, flash, url_for
 from flask.ext.login import login_required
 
@@ -14,7 +14,7 @@ def user_profile(name):
     if g.user and g.user.name == name:
         return render_template('user_profile.html', user=g.user, mappings=view_mappings(g.user))
 
-    viewed = user.user_with_name(name)
+    viewed = kaizen_user.user_with_name(name)
     if viewed:
         return render_template('user_profile.html', user=viewed, mappings=view_mappings(viewed))
     flash('No user with name %s, should have 404ed' % name)
