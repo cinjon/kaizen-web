@@ -1,37 +1,41 @@
 import app
-from app import db
-from app import utility
+from app import db, utility, messages
 import mapping
-import note
 import sql
 from mapping import Mapping
-from flask import session
+from flask import session, flash
 from flask.ext.login import login_user
 from sqlalchemy import and_
+from flask.ext.security import UserMixin
+from role import roles_users
 
 ROLE_USER = 0
 ROLE_ADMIN = 1
 ROLE_TEST = 2
 
-class User(db.Model):
+STATUS_AWAITING_CONFIRMATION = 'awaiting_confirm'
+STATUS_ACTIVE = 'active'
+
+
+class KaizenUser(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     first = db.Column(db.String(64)) #Required
     last = db.Column(db.String(64)) #Required
     name = db.Column(db.String(120)) #Should be unique by design, but not set to be here.
     email = db.Column(db.String(120), unique=True, index=True) #Required
     password = db.Column(db.String(100)) #Required
+    active = db.Column(db.Boolean())
     creation_time = db.Column(db.DateTime)
-    role = db.Column(db.SmallInteger, default=ROLE_USER)
+    last_login_at = db.Column(db.DateTime())
+    current_login_at = db.Column(db.DateTime())
+    last_login_ip = db.Column(db.String(100))
+    current_login_ip = db.Column(db.String(100))
+    login_count = db.Column(db.Integer)
+    confirmed_at = db.Column(db.DateTime())
+    roles = db.relationship('Role', secondary=roles_users,
+                            backref=db.backref('users', lazy='dynamic'))
     mappings = db.relationship('Mapping', backref='user', lazy='dynamic')
 
-    def __init__(self, first, last, email, password, role=ROLE_USER):
-        self.first = first
-        self.last = last
-        self.email = email
-        self.password = self.set_password(password)
-        self.creation_time = utility.get_time()
-        self.name = self.set_name(first, last)
-        self.role = role
 
     def is_authenticated(self):
         #Can the user be logged in in general?
@@ -49,7 +53,7 @@ class User(db.Model):
 
     def set_name(self, first, last):
         name = first + '-' + last
-        count = len(User.query.filter(and_(User.first==first, User.last==last)).all())
+        count = len(KaizenUser.query.filter(and_(KaizenUser.first==first, KaizenUser.last==last)).all())
         if count > 0:
             return name + '-' + str(count)
         else:
@@ -113,21 +117,21 @@ class User(db.Model):
         return '%s %s' % (self.first, self.last)
 
 def create_user(first, last, email, password, role=ROLE_USER):
-    user = User(first=first, last=last, email=email, password=password, role=role)
+    user = KaizenUser(first=first, last=last, email=email, password=password, role=role)
     sql.add(user)
     return user
 
 def user_with_id(id):
-    return User.query.get(int(id))
+    return KaizenUser.query.get(int(id))
 
 def user_with_name(name):
-    filtered = User.query.filter_by(name=name).all()
+    filtered = KaizenUser.query.filter_by(name=name).all()
     if len(filtered) == 1:
         return filtered[0]
     return None
 
 def user_with_email(email):
-    filtered = User.query.filter_by(email=email).all()
+    filtered = KaizenUser.query.filter_by(email=email).all()
     if len(filtered) == 1:
         return filtered[0]
     return None
@@ -148,10 +152,12 @@ def authenticate(u, password):
 
 def try_register(email, password, first, last, xhr=False):
     if not user_with_email(email):
-        create_user(first, last, email, password)
+        app.security_ds.create_user(email=email, password=password, first=first, last=last)
+        app.security_ds.commit()
+        flash(messages.EMAIL_VALIDATION_SENT, 'info')
     return try_login(email, password, xhr=xhr)
 
 def all_users_sorted_by_note_total():
-    users = User.query.all()
+    users = KaizenUser.query.all()
     return sorted(users, key=lambda x: x.number_of_notes())
 

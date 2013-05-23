@@ -1,4 +1,4 @@
-import user
+import kaizen_user
 import mapping
 import note
 import site

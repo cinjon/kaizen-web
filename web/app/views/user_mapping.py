@@ -1,7 +1,6 @@
 import app
 import json
-from flask import g, render_template, url_for, redirect
-from flask.ext.login import login_required
+from flask import render_template, url_for, redirect
 
 show_canvas = True
 
@@ -10,7 +9,7 @@ show_canvas = True
 
 @app.flask_app.route('/user/<uname>/<mname>', methods=['GET'])
 def user_mapping(uname, mname):
-    u = app.models.user.user_with_name(uname)
+    u = app.models.kaizen_user.user_with_name(uname)
     if not u:
         flash('No user with name %s, should have 404ed' % uname)
         return app.views.index.go_to_index()

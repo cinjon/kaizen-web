@@ -14,3 +14,4 @@ def xhr_notes():
     if request.is_xhr:
         g.user.add_note(data=request.form)
         return utility.xhr_201(True)
+
