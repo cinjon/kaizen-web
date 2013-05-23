@@ -36,6 +36,15 @@ class KaizenUser(db.Model, UserMixin):
                             backref=db.backref('users', lazy='dynamic'))
     mappings = db.relationship('Mapping', backref='user', lazy='dynamic')
 
+    def __init__(self, first, last, email, password, roles, active):
+        self.first = first
+        self.last = last
+        self.email = email
+        self.active = active
+        self.password = self.set_password(password)
+        self.creation_time = utility.get_time()
+        self.name = self.set_name(first, last)
+        self.roles = roles
 
     def is_authenticated(self):
         #Can the user be logged in in general?
@@ -52,10 +61,10 @@ class KaizenUser(db.Model, UserMixin):
         return unicode(self.id)
 
     def set_name(self, first, last):
-        name = first + '-' + last
+        name = first + '_' + last
         count = len(KaizenUser.query.filter(and_(KaizenUser.first==first, KaizenUser.last==last)).all())
         if count > 0:
-            return name + '-' + str(count)
+            return name + '' + str(count)
         else:
             return name
 
@@ -63,8 +72,7 @@ class KaizenUser(db.Model, UserMixin):
         return utility.generate_hash(password)
 
     def check_password(self, password):
-        return self.password == password
-        # return utility.check_hash(self.password, password)
+        return utility.check_hash(self.password, password)
 
     def get_current_mappings(self):
         return self.mappings.filter(Mapping.binding > -1).order_by(Mapping.binding)

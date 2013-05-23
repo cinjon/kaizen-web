@@ -3,10 +3,12 @@ from app.models import kaizen_user
 from flask import g, render_template, redirect, flash, url_for
 from flask.ext.login import login_required
 
+
 @flask_app.route('/me')
 @login_required
 def user_profile_owner():
     return render_template('user_profile.html', user=g.user, mappings=view_mappings(g.user))
+
 
 @flask_app.route('/user/<name>')
 @login_required
@@ -19,6 +21,7 @@ def user_profile(name):
         return render_template('user_profile.html', user=viewed, mappings=view_mappings(viewed))
     flash('No user with name %s, should have 404ed' % name)
     #TODO return no user with name 404 page
+
 
 def view_mappings(u):
     mappings = []

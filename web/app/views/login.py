@@ -44,6 +44,7 @@ def ext_register():
         return kaizen_user.try_register(email, password, first, last, xhr=True)
 
 
+#only for the extension
 @flask_app.route('/ext-logout')
 @login_required
 def logout():
