@@ -9,6 +9,12 @@
     margin-bottom: 20px;
   }
 
+  #map-notes {
+    border: 1px solid;
+    margin-bototm: 20px;
+    min-height: 100px;
+  }
+
   #map-sites {
     min-height:100px;
     border: 1px solid;
@@ -28,23 +34,19 @@
 {% endblock %}
 
 {% block content %}
-<div class="row" id="mapName" style="margin-left:20px"></div>
-<div class="row" id="personName" style="margin-left:40px"><p>by first name last name</p></div>
 <hr>
 <div class="container-fluid">
   {% if mapping %}
   <div class="row-fluid" id="show-canvas">
-    <div class="span4">
-      <div class="container-fluid">
-        <div class="row-fluid sidebar" id="map-nav"></div>
-        <div class="row-fluid sidebar" id="map-notes"></div>
+    <div class="row-fluid">
+      <div class="container-fluid" id="map-notes">
+        <div class="span1" id="note-time"></div>
+        <div class="span11" id="note-text"></div>
       </div>
     </div>
-    <div class="span8">
-      <div class="container-fluid">
-        <div class="row-fluid" id="map-sites"></div>
-        <div class="row-fluid" id="map-sandlot"></div>
-      </div>
+    <hr>
+    <div class="row-fluid">
+      <div class="container-fluid" id="map-sandlot"></div>
     </div>
   </div>
   {% endif %}
