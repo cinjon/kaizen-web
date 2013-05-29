@@ -22,7 +22,9 @@ def user_mapping(uname, mname):
         return redirect(url_for('user_profile', name=uname))
 
     vis = models.mapping.visualize(m)
-    return render_template('user_mapping.html', user=u, mapping=json.dumps(vis), mname=json.dumps(m.name), show_canvas=json.dumps(show_canvas))
+    return render_template('user_mapping.html', user=u,
+                           show_canvas=json.dumps(show_canvas), mapping=json.dumps(vis))
+
 
 
 @flask_app.route('/user/<uname>/edit/<mname>', methods=['GET'])
