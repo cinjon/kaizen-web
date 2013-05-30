@@ -23,8 +23,7 @@ def check_hash(stored, request):
 def decodeJS(component):
     unquoted = urllib.unquote_plus(component.encode('utf-8'))
     st = unquoted.decode('utf-8')
-    st.replace(u'\u2014', u'-') #lolol.
-    return st
+    return unicode_replace(st)
 
 def xhr_response(data, code):
     response = jsonify(data)
@@ -50,3 +49,16 @@ def json_handler(obj):
         return obj.isoformat()
     else:
         raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj))
+
+def short_text(txt, length, replace):
+    if len(txt) > length:
+        return txt[:(length - len(replace))]
+    return txt
+
+def unicode_replace(txt):
+    #this is fucking silly
+    txt.replace(u'\u2019', u"'")
+    txt.replace(u'\u201c', u'"')
+    txt.replace(u'\u201d', u'"')
+    txt.replace(u'\u2014', u'-')
+    return txt
