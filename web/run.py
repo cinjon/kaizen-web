@@ -1,4 +1,4 @@
 #!venv/bin/python
-from app import flask_app
-
-flask_app.run(debug=True)
+import app
+app.db.create_all()
+app.flask_app.run(debug=True)
