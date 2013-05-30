@@ -3,6 +3,7 @@ from flask import session, flash
 from flask.ext.login import login_user
 from sqlalchemy import and_
 from flask.ext.security import UserMixin
+from app.models.role import roles_users
 
 ROLE_USER = 0
 ROLE_ADMIN = 1
@@ -26,12 +27,11 @@ class KaizenUser(app.db.Model, UserMixin):
     current_login_ip = app.db.Column(app.db.String(100))
     login_count = app.db.Column(app.db.Integer)
     confirmed_at = app.db.Column(app.db.DateTime())
-#     from app.models.role import roles_users
-#     roles = app.db.relationship('Role', secondary=roles_users,
-#                             backref=app.db.backref('users', lazy='dynamic'))
+    roles = app.db.relationship('Role', secondary=roles_users,
+                            backref=app.db.backref('users', lazy='dynamic'))
     mappings = app.db.relationship('Mapping', backref='user', lazy='dynamic')
 
-    def __init__(self, first, last, email, password, active):
+    def __init__(self, first, last, email, password, roles, active):
         self.first = first
         self.last = last
         self.email = email
@@ -39,7 +39,7 @@ class KaizenUser(app.db.Model, UserMixin):
         self.password = self.set_password(password)
         self.creation_time = app.utility.get_time()
         self.name = self.set_name(first, last)
-#         self.roles = roles
+        self.roles = roles
 
     def is_authenticated(self):
         #Can the user be logged in in general?
@@ -120,8 +120,8 @@ class KaizenUser(app.db.Model, UserMixin):
     def __repr__(self):
         return '%s %s' % (self.first, self.last)
 
-def create_user(first, last, email, password, active=True):
-    user = KaizenUser(first=first, last=last, email=email, password=password, active=active)
+def create_user(first, last, email, password, role=ROLE_USER, active=True):
+    user = KaizenUser(first=first, last=last, email=email, password=password, role=role, active=active)
     app.models.sql.add(user)
     return user
 
