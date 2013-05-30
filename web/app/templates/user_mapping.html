@@ -3,33 +3,20 @@
 {% block head %}
 {{ super() }}
 <style>
-  #map-nav {
-    min-height:100px;
-    border: 1px solid;
-    margin-bottom: 20px;
-  }
-
-  #map-notes {
-    border: 1px solid;
-    margin-bototm: 20px;
-    min-height: 100px;
-  }
-
-  #map-sites {
-    min-height:100px;
-    border: 1px solid;
-    margin-bottom: 20px;
-  }
-
   #map-sandlot {
     border: 1px solid;
   }
 
-  .sidebar {
+  .infobar {
     background-color:#dceaf4;
+    margin-bottom:2px;
+    border:1px solid;
     min-height:100px;
   }
 
+  .weight {
+    width:35px;
+  }
 </style>
 {% endblock %}
 
@@ -38,10 +25,22 @@
 <div class="container-fluid">
   {% if mapping %}
   <div class="row-fluid" id="show-canvas">
-    <div class="row-fluid">
-      <div class="container-fluid" id="map-notes">
-        <div class="span1" id="note-time"></div>
+    <div class="row-fluid infobar">
+      <div id="map-root"></div>
+      <div id="map-note" style="display:hidden">
+        <div class="span1">
+          <div class="row-fluid" id="note-time"></div>
+          <div class="row-fluid">
+            <input class="weight" id="note-weight" type="number" max=10>
+          </div>
+        </div>
         <div class="span11" id="note-text"></div>
+      </div>
+      <div id="map-site" style="display:hidden">
+        <div class="span1" id="site-weight">
+          <input class="weight" id="site-weight" type="number" max=10>
+        </div>
+        <div class="span11" id="site-title"></div>
       </div>
     </div>
     <hr>

@@ -21,8 +21,6 @@
 //      site:{0, 1, ...}}
 //  ...
 // }
-
-
 var width, height, radius;
 var links, groups, rects;
 var mapdata;
@@ -33,6 +31,7 @@ var mapdata;
 function showMappingVisualization(server_data, show) {
     if (server_data && show) {
         mapdata = server_data;
+        display_root();
         start_map_sandlot();
     }
 }
@@ -94,31 +93,66 @@ set_initial_conditions = function(sandlot) {
     set_rects();
 };
 
-function display_note(name) {
+display_root = function() {
+    console.log('display root');
+    $("#map-root")[0].innerHTML = _display_root_name(mapdata.mapname);
+    $("#map-site").hide();
+    $("#map-note").hide();
+    $("#map-root").show();
+}
+
+_display_root_name = function(mapname) {
+    return '<p style="margin-top:20px; font-size:30px; text-align:center;">' + mapname + '</p>';
+}
+
+display_note = function(name) {
     data = mapdata['note_id_' + name];
     var date = new Date(data.time * 1000);
     $("#note-time")[0].innerHTML = '<p>' + date.getMonth() + '/' + date.getDate() + '/' + date.getFullYear() + '</p>';
     $("#note-text")[0].innerHTML = '<p>' + data.text + '</p>';
+    $("#map-site").hide();
+    $("#map-root").hide();
+    $("#map-note").show();
+}
+
+display_site = function(name) {
+    data = mapdata['site_id_' + name];
+    console.log('data is ' + data);
+    $("#site-title")[0].innerHTML = '<p><a href="' + data.url + '">' + data.title + '</a></p>';
+    $("#map-note").hide();
+    $("#map-root").hide();
+    $("#map-site").show();
 }
 
 var drag = d3.behavior.drag().on("drag", move);
 function move() {
+    var g = $("#" + this.parentNode.id);
     var circle = d3.select(this);
-    var g = $("#" + this.parentNode.id)[0];
-    var texts = g.getElementsByTagName('text');
-    var rectangles = g.getElementsByTagName('rect');
+    var r  = parseInt(circle.attr("r"));
+    var box_width =  Math.max(g[0].getElementsByClassName('siteText')[0].getBBox().width, 2*r);
 
     var cx = parseInt(circle.attr("cx"));
     var cy = parseInt(circle.attr("cy"));
-    var r  = parseInt(circle.attr("r"));
-    var box_width =  Math.max(g.getElementsByClassName('siteText')[0].getBBox().width, 2*r);
+    console.log('dx, dy, x, y ' + d3.event.dx + ', ' + d3.event.dy + ', ' + d3.event.x + ', ' + d3.event.y);
+    console.log('before: cx, cy ' + cx + ', ' + cy);
+    if (g.attr("transform")) {
+        var translate = g.attr("transform").split('translate')[1].split(',');
+        cx = cx + parseInt(translate[0].slice(1));
+        cy = cy + parseInt(translate[1].slice(0,-1));
+        console.log('after: cx, cy ' + cx + ', ' + cy);
+    }
+
     var new_cx = Math.max(r, Math.min(width - box_width + r, d3.event.dx + cx));
     var new_cy = Math.max(r, Math.min(height - r, d3.event.dy + cy));
 
-    circle
-        .attr("cx", new_cx)
-        .attr("cy", new_cy);
+    d3.select("#" + this.parentNode.id).
+        attr("transform",
+             "translate(" + (new_cx-cx) + "," + (new_cy-cy) + ")");
 
+//     circle
+//         .attr("cx", new_cx)
+//         .attr("cy", new_cy);
+//     texts.attr
 //     texts.each(function(text) {
 //         console.log('text: ' + text);
 //         var new_x = text.attr("x") - (new_cx - cx);
@@ -127,13 +161,13 @@ function move() {
 //             .attr("x", new_x)
 //             .attr("y", new_y);
 //     });
-    for (var rect in rectangles) {
-        var new_x = rect.attr("x") - (new_cx - cx);
-        var new_y = rect.attr("y") - (new_cy - cy);
-        rect
-            .attr("x", new_x)
-            .attr("y", new_y);
-    }
+//     for (var rect in rectangles) {
+//         var new_x = rect.attr("x") - (new_cx - cx);
+//         var new_y = rect.attr("y") - (new_cy - cy);
+//         rect
+//             .attr("x", new_x)
+//             .attr("y", new_y);
+//     }
 };
 
 make_root = function(svg, name, position, radius) {
@@ -142,6 +176,8 @@ make_root = function(svg, name, position, radius) {
     g = svg.append("svg:g")
         .attr("id", _id);
     groups[_id] = g
+
+    var click_func = function() {display_root();};
     circle = g.append("svg:circle")
         .attr("class", "node")
         .attr("cx", position[0])
@@ -149,8 +185,9 @@ make_root = function(svg, name, position, radius) {
         .attr("r", radius)
         .attr("fill", "wheat")
         .attr("stroke", "#dceaf4")
+        .on("click", click_func)
         .call(drag);
-    text = make_node_text(g, name, position[0] - radius, position[1], 'rootText');
+    text = make_node_text(g, name, position[0]-radius, position[1], 'rootText', click_func);
 }
 
 make_site = function(svg, name, position, radius) {
@@ -159,18 +196,21 @@ make_site = function(svg, name, position, radius) {
     g = svg.append("svg:g")
         .attr("id", _id);
     groups[_id] = g;
+
+    var click_func = function() {display_site(name);};
     circle = g.append("svg:circle")
         .attr("class", "node")
         .attr("r", radius)
         .attr("cx", position[0])
         .attr("cy", position[1])
         .attr("fill", "#dceaf4")
+        .on("click", click_func)
         .call(drag);
-    text = make_node_text(g, name, position[0] - radius, position[1], 'siteText');
+    text = make_node_text(g, name, position[0]-radius, position[1], 'siteText', click_func);
 }
 
-make_node_text = function(g, name, x, y, text_class) {
-    return g.append("text")
+make_node_text = function(g, name, x, y, text_class, click_func) {
+    var text = g.append("svg:text")
         .attr("x", x)
         .attr("y", y)
         .text(name)
@@ -178,6 +218,10 @@ make_node_text = function(g, name, x, y, text_class) {
         .attr("font-size", "16px")
         .attr("fill", "red")
         .attr("class", text_class);
+    if (click_func) {
+        text.on("click", click_func);
+    }
+    return text;
 };
 
 make_note = function(svg, name, position, radius, site) {
@@ -186,6 +230,7 @@ make_note = function(svg, name, position, radius, site) {
     groups['g_note_' + name] = g;
 
     side = 30;
+    var click_func = function() {display_note(name);};
     rectangle = g.append("svg:rect")
         .attr("class", "note")
         .attr("x", position[0] - side/2)
@@ -198,9 +243,8 @@ make_note = function(svg, name, position, radius, site) {
         .attr("stroke-width", 5)
         .attr("opacity", .5)
         .attr("id", name)
-        .on("click", function() {
-            display_note(name);});
-    make_node_text(g, name, position[0] - side/2, position[1], 'noteText');
+        .on("click", click_func);
+    make_node_text(g, name, position[0] - side/2, position[1], 'noteText', click_func);
     rects['r_note_' + name] = rectangle;
 }
 
