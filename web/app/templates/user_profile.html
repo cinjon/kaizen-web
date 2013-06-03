@@ -1,18 +1,57 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{user.first}} {{user.last}}</h1>
-<hr>
+<style>
+.box {
+    padding: 25px 15px 5px 35px;
+}
+</style>
 <div class="row">
-  <div class="span2"><p>Binding</p></div>
-  <div class="span8"><p>Map Name</p></div>
-  <div class="span2"><p>Notes</p></div>
-</div><br>
-{% for mapping in mappings %}
-<div class="row">
-  <div class="span2"><p>{{mapping.binding}}</p></div>
-  <div class="span8"><p><a href="{{ url_for('user_mapping', uname=user.name, mname=mapping.name) }}">{{mapping.name}}</a></p></div>
-  <div class="span2"><p>{{mapping.notes}}</p></div>
-</div><br />
-{% endfor %}
+    <div class="span12">
+        <h2>{{user.first}} {{user.last}}'s maps</h2>
+    </div>
+</div>
+<div class="box">
+    <div class="row">
+        <div class="span11">
+            <input id="mapTypeAhead" type="text" class="span11" style="margin: 0 auto;" data-provide="typeahead" data-items="4"
+                   data-source='[{% for mapping in mappings %}&quot;{{mapping.name}}&quot;,{% endfor %}&quot;--&quot;]'
+                   autocomplete="off" placeholder="Search your maps">
+        <hr/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span11">
+            <table data-provides="rowlink" class="table table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <td>Map Name</td>
+                        <td>Binding</td>
+                        <td>Last Update</td>
+                        <td>Notes</td>
+                    </tr>
+                </thead>
+                <tbody>
+                  {% for mapping in mappings %}
+                  <tr>
+                    <td><p><a href="{{ url_for('user_mapping', uname=user.name, mname=mapping.name) }}">{{mapping.name}}</a></p></td>
+                    <td><p>{{mapping.binding}}</p></td>
+                    <td>
+                      {% if mapping.notes %} <p>{{mapping.notes[0].creation_time.strftime('%Y-%m-%d')}}</p> {% else %} - {% endif %}
+                    </td>
+                    <td><p>{{mapping.notes|length}}</p></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $('#mapTypeAhead').change(function(){
+        window.location = '/user/{{ user.name }}/' + $(this).val();
+    });
+
+</script>
 {% endblock %}
