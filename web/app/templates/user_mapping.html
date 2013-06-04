@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 
-
 {% block head %}
 {{ super() }}
 <style>
@@ -26,7 +25,7 @@
 <div class="container-fluid">
   {% if mapping %}
   <div class="row-fluid" id="show-canvas">
-    <div class="row-fluid infobar">
+    <div class="row note-wrapper">
       <div id="map-root"></div>
       <div id="map-note" style="display:hidden">
         <div class="span1">
@@ -54,7 +53,6 @@
 {% endblock %}
 
 {% block footer %}
-{{ super() }}
 <script src="/static/js/d3.v3.js"></script>
-<script src="/static/js/user_mapping.js" onload="showMappingVisualization({{mapping}}, {{show_canvas}})"></script>
+<script src="/static/js/user_mapping.js" onload="showMappingVisualization({{json_mapping}}, {{show_canvas}})"></script>
 {% endblock %}

@@ -54,8 +54,10 @@ def user_mapping(uname, mname):
         return redirect(url_for('user_profile', name=uname))
 
     vis = models.mapping.visualize(m)
-    return render_template('user_mapping.html', user=u,
-                           show_canvas=json.dumps(show_canvas), mapping=json.dumps(vis))
+    return render_template('user_mapping.html', mapping=m,
+                           show_canvas=json.dumps(show_canvas),
+                           json_mapping=json.dumps(vis))
+
 
 #TODO(Alex)
 @flask_app.route('/user/<uname>/alex/<mname>', methods=['GET'])
@@ -70,9 +72,7 @@ def user_mapping_alex(uname, mname):
         flash('No mapping with name %s, should have 404ed' % mname)
         return redirect(url_for('user_profile', name=uname))
 
-    vis = models.mapping.visualize(m)
-    return render_template('user_mapping_alex.html', user=u,
-                           show_canvas=json.dumps(show_canvas), mapping=json.dumps(vis))
+    return render_template('user_mapping_alex.html', mapping=m)
 
 @flask_app.route('/user/<uname>/edit/<mname>', methods=['GET'])
 @login_required

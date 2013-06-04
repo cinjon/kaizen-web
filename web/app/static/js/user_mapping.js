@@ -128,46 +128,22 @@ var drag = d3.behavior.drag().on("drag", move);
 function move() {
     var g = $("#" + this.parentNode.id);
     var circle = d3.select(this);
+    var circle_text = g[0].getElementsByClassName('siteText')[0];
     var r  = parseInt(circle.attr("r"));
-    var box_width =  Math.max(g[0].getElementsByClassName('siteText')[0].getBBox().width, 2*r);
+    var box_width =  Math.max(circle_text.getBBox().width, 2*r);
 
     var cx = parseInt(circle.attr("cx"));
     var cy = parseInt(circle.attr("cy"));
-    console.log('dx, dy, x, y ' + d3.event.dx + ', ' + d3.event.dy + ', ' + d3.event.x + ', ' + d3.event.y);
-    console.log('before: cx, cy ' + cx + ', ' + cy);
-    if (g.attr("transform")) {
-        var translate = g.attr("transform").split('translate')[1].split(',');
-        cx = cx + parseInt(translate[0].slice(1));
-        cy = cy + parseInt(translate[1].slice(0,-1));
-        console.log('after: cx, cy ' + cx + ', ' + cy);
-    }
 
     var new_cx = Math.max(r, Math.min(width - box_width + r, d3.event.dx + cx));
     var new_cy = Math.max(r, Math.min(height - r, d3.event.dy + cy));
 
-    d3.select("#" + this.parentNode.id).
-        attr("transform",
-             "translate(" + (new_cx-cx) + "," + (new_cy-cy) + ")");
-
-//     circle
-//         .attr("cx", new_cx)
-//         .attr("cy", new_cy);
-//     texts.attr
-//     texts.each(function(text) {
-//         console.log('text: ' + text);
-//         var new_x = text.attr("x") - (new_cx - cx);
-//         var new_y = text.attr("y") - (new_cy - cy);
-//         text
-//             .attr("x", new_x)
-//             .attr("y", new_y);
-//     });
-//     for (var rect in rectangles) {
-//         var new_x = rect.attr("x") - (new_cx - cx);
-//         var new_y = rect.attr("y") - (new_cy - cy);
-//         rect
-//             .attr("x", new_x)
-//             .attr("y", new_y);
-//     }
+    circle
+        .attr("cx", new_cx)
+        .attr("cy", new_cy);
+    circle_text
+        .attr("x", new_cx - r)
+        .attr("y", new_cy);
 };
 
 make_root = function(svg, name, position, radius) {
