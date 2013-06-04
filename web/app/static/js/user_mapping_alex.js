@@ -1,6 +1,6 @@
 $(function() {
     $('a.removeNote').bind('click', function() {
-        $.getJSON('{{ url_for('remove_index') }}', {
+        $.getJSON("{{ url_for('remove_index') }}", {
             loopId: $(this).closest('.controls-wrapper').children('.loopId').val(),
             mapId: $(this).closest('.controls-wrapper').children('.mapId').val()
         }, function(data) {
@@ -13,7 +13,7 @@ $(function() {
 $(function() {
     $('input.reindexNote').keyup(function(event){
         if(event.keyCode == 13){
-            $.getJSON('{{ url_for('reindex_note') }}', {
+            $.getJSON("{{ url_for('reindex_note') }}", {
                 loopId: $(this).closest('.controls-wrapper').children('.loopId').val(),
                 targetIndex: $(this).val(),
                 mapId: $(this).closest('.controls-wrapper').children('.mapId').val()
