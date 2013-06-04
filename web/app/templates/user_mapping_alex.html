@@ -3,96 +3,95 @@
 {% block content %}
 <h2>{{ mapping.name }}</h2>
 {% for note in mapping.notes %}
-    <div class="row note-wrapper">
-        <div class="span12">
-            <div class="box-wrapper" >
-                <div class="box shadow-box">
-                      <div class="controls-wrapper highcontrols-wrapper">
-                          <input class="loopId" type="hidden" value="{{ note.id }}"/>
-                          <input class="mapId" type="hidden" value="{{ mapping.id }}"/>
-                          <div class="row ">
-                              <div class="span7">
-                                  <div class="btn-toolbar pull-left">
-                                      <div class="btn-group">
-                                        <a class="btn removeNote" href="#"><i class="icon-remove"></i> Remove</a>
-                                      </div>
-                                  </div>
-                                  <div class="btn-toolbar margin-left pull-left">
-                                      <input type="text" class="input-small reindexNote" placeholder="Reindex to #">
-                                  </div>
-                              </div>
-                              <div class="span5"></div>
-                          </div>
-                      </div>
-                  <div class="row margin-bottom">
-                      <div class="span11">
-                          <span class="pull-right">
-                              <em><small class="muted">{{ note.creation_time.strftime('%Y-%m-%d') }}</small></em>
-                          </span>
-                      </div>
-                  </div>
-                  <div class="row">
-                      <div class="span8 offset2">
-                        {% if loop.index % 2 == 0 %} <blockquote> {% else %} <blockquote class="pull-right"> {% endif %}
-                          <p class="noteText zoom-box" data-toggle="modal" data-target="#myModal{{ loop.index }}">{{ note.text }}</p>
-                          <small>
-                              <cite title="{{ note.url }}">
-                                  <a target="_blank" href="{{ note.url }}">{{ note.url[0:40] }}</a>
-                              </cite>
-                          </small>
-                        </blockquote>
-                      </div>
-                  </div>
-                  <div class="row">
-                      <div class="span5">
-                          <h6 class="muted pull-left">{{ loop.index }}</h6>
-                      </div>
-                  </div>
-                </div>
-            </div>
-            <!-- Modal -->
-            <div id="myModal{{ loop.index }}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 id="myModalLabel">{{ mapping.name }}</h3>
-              </div>
-              <div class="modal-body">
-                <div class="box">
-                  <div class="row margin-bottom">
-                      <div class="span11">
-                          <span class="pull-right">
-                              <em><small class="muted">{{ note.creation_time.strftime('%Y-%m-%d') }}</small></em>
-                          </span>
-                      </div>
-                  </div>
-                  <div class="row">
-                      <div class="span8 offset2">
-                        {% if loop.index % 2 == 0 %} <blockquote> {% else %} <blockquote class="pull-right"> {% endif %}
-                          <p class="noteText">{{ note.text }}</p>
-                          <small>
-                              <cite title="{{ note.url }}">
-                                  <a target="_blank" href="{{ note.url }}">{{ note.url[0:40] }}</a>
-                              </cite>
-                          </small>
-                        </blockquote>
-                      </div>
-                  </div>
-                  <div class="row">
-                      <div class="span1">
-                          <h6 class="muted pull-left">{{ loop.index }}</h6>
-                      </div>
-                  </div>
+<div class="row note-wrapper">
+  <div class="span12">
+    <div class="box-wrapper" >
+      <div class="box shadow-box">
+        <div class="controls-wrapper highcontrols-wrapper">
+          <input class="loopId" type="hidden" value="{{ note.id }}"/>
+          <input class="mapId" type="hidden" value="{{ mapping.id }}"/>
+          <div class="row ">
+            <div class="span7">
+              <div class="btn-toolbar pull-left">
+                <div class="btn-group">
+                  <a class="btn removeNote" href="#"><i class="icon-remove"></i> Remove</a>
                 </div>
               </div>
+              <div class="btn-toolbar margin-left pull-left">
+                <input type="text" class="input-small reindexNote" placeholder="Reindex to #">
+              </div>
             </div>
+            <div class="span5"></div>
+          </div>
         </div>
+        <div class="row margin-bottom">
+          <div class="span11">
+            <span class="pull-right">
+              <em><small class="muted">{{ note.creation_time.strftime('%Y-%m-%d') }}</small></em>
+            </span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="span8 offset2">
+            {% if loop.index % 2 == 0 %} <blockquote> {% else %} <blockquote class="pull-right"> {% endif %}
+                <p class="noteText zoom-box" data-toggle="modal" data-target="#myModal{{ loop.index }}">{{ note.text }}</p>
+                <small>
+                  <cite title="{{ note.url }}">
+                    <a target="_blank" href="{{ note.url }}">{{ note.url[0:40] }}</a>
+                  </cite>
+                </small>
+              </blockquote>
+          </div>
+        </div>
+        <div class="row">
+          <div class="span5">
+            <h6 class="muted pull-left">{{ loop.index }}</h6>
+          </div>
+        </div>
+      </div>
     </div>
-    {% endfor %}
+    <!-- Modal -->
+    <div id="myModal{{ loop.index }}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">{{ mapping.name }}</h3>
+      </div>
+      <div class="modal-body">
+        <div class="box">
+          <div class="row margin-bottom">
+            <div class="span11">
+              <span class="pull-right">
+                <em><small class="muted">{{ note.creation_time.strftime('%Y-%m-%d') }}</small></em>
+              </span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="span8 offset2">
+              {% if loop.index % 2 == 0 %} <blockquote> {% else %} <blockquote class="pull-right"> {% endif %}
+                  <p class="noteText">{{ note.text }}</p>
+                  <small>
+                    <cite title="{{ note.url }}">
+                      <a target="_blank" href="{{ note.url }}">{{ note.url[0:40] }}</a>
+                    </cite>
+                  </small>
+                </blockquote>
+            </div>
+          </div>
+          <div class="row">
+            <div class="span1">
+              <h6 class="muted pull-left">{{ loop.index }}</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
 
-    {% block footer %}
-    {{ super() }}
-    <script src="/static/js/user_mapping_alex.js"></script>
-    {% endblock %}
+{% block footer %}
+{{ super() }}
+<script src="/static/js/user_mapping_alex.js"></script>
 {% endblock %}
 
 {% endblock %}
