@@ -1,0 +1,62 @@
+.controls-wrapper {
+    left: 1%;
+    position: absolute;
+    text-align: right;
+    visibility: hidden;
+}
+
+.highcontrols-wrapper {
+    z-index: 101;
+    top: -4px;
+}
+
+.lowcontrols-wrapper {
+    z-index: 100;
+    top: 45px;
+}
+
+.note-wrapper:hover .controls-wrapper{
+    visibility: visible;
+    transition:background .4s ease-in;
+}
+
+.box-wrapper {
+    opacity: .85;
+    filter:alpha(opacity=85);
+}
+
+.box-wrapper:hover {
+    background:lightgreen;
+    opacity:1.0;
+    filter:alpha(opacity=100);
+    -o-transition:background .4s ease-in;
+    -ms-transition:background .4s ease-in;
+    -moz-transition:background .4s ease-in;
+    -webkit-transition:background .4s ease-in;
+    /* ...and now override with proper CSS property */
+    transition:background .4s ease-in;
+}
+
+.zoom-box:hover {
+    cursor: -webkit-zoom-in;
+    cursor: -moz-zoom-in;
+}
+
+.box:hover {
+	-webkit-box-shadow: 0 0 11px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 0 0 11px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 0 11px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.margin-left {
+    margin-left: 10px;
+}
+
+.margin-bottom {
+    margin-bottom: 5px;
+}
+
+.modal {
+    left: 27%;
+    width: 93%;
+}
