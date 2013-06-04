@@ -1,62 +1,63 @@
-.controls-wrapper {
-    left: 1%;
-    position: absolute;
-    text-align: right;
-    visibility: hidden;
+hr.style-one {
+    border: 0;
+    height: 1px;
+    background: #333;
+    background-image: -webkit-linear-gradient(left, #ccc, #333, #ccc);
+    background-image:    -moz-linear-gradient(left, #ccc, #333, #ccc);
+    background-image:     -ms-linear-gradient(left, #ccc, #333, #ccc);
+    background-image:      -o-linear-gradient(left, #ccc, #333, #ccc);
 }
 
-.highcontrols-wrapper {
-    z-index: 101;
-    top: -4px;
+hr.style-two {
+    border: 0;
+    height: 1px;
+    background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
 }
 
-.lowcontrols-wrapper {
-    z-index: 100;
-    top: 45px;
+.box {
+	position: relative;
+	padding: 15px 15px 5px 15px;
+	margin: 0 auto;
+    margin-bottom: 15px;
+	background-color: #fff;
+	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 0 3px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
-.note-wrapper:hover .controls-wrapper{
-    visibility: visible;
-    transition:background .4s ease-in;
+h2,h3 {
+    font-weight: 300;
 }
 
-.box-wrapper {
-    opacity: .85;
-    filter:alpha(opacity=85);
+.shadow-box:before, .shadow-box:after
+{
+	position: absolute;
+	width: 40%;
+	height: 10px;
+	content: ' ';
+	left: 22px;
+	bottom: 22px;
+	background: transparent;
+	-webkit-transform: skew(-5deg) rotate(-5deg);
+	-moz-transform: skew(-5deg) rotate(-5deg);
+	-ms-transform: skew(-5deg) rotate(-5deg);
+	-o-transform: skew(-5deg) rotate(-5deg);
+	transform: skew(-5deg) rotate(-5deg);
+	-webkit-box-shadow: 0 10px 18px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: 0 10px 18px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 10px 18px rgba(0, 0, 0, 0.3);
+	z-index: -1;
 }
-
-.box-wrapper:hover {
-    background:lightgreen;
-    opacity:1.0;
-    filter:alpha(opacity=100);
-    -o-transition:background .4s ease-in;
-    -ms-transition:background .4s ease-in;
-    -moz-transition:background .4s ease-in;
-    -webkit-transition:background .4s ease-in;
-    /* ...and now override with proper CSS property */
-    transition:background .4s ease-in;
-}
-
-.zoom-box:hover {
-    cursor: -webkit-zoom-in;
-    cursor: -moz-zoom-in;
-}
-
-.box:hover {
-	-webkit-box-shadow: 0 0 11px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
-	-moz-box-shadow: 0 0 11px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
-	box-shadow: 0 0 11px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
-}
-
-.margin-left {
-    margin-left: 10px;
-}
-
-.margin-bottom {
-    margin-bottom: 5px;
-}
-
-.modal {
-    left: 27%;
-    width: 93%;
+.shadow-box:after
+{
+	left: auto;
+	right: 20px;
+	-webkit-transform: skew(5deg) rotate(5deg);
+	-moz-transform: skew(5deg) rotate(5deg);
+	-ms-transform: skew(5deg) rotate(5deg);
+	-o-transform: skew(5deg) rotate(5deg);
+	transform: skew(5deg) rotate(5deg);
 }
