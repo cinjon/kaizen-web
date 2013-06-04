@@ -8,8 +8,8 @@
     <link href="/static/css/bootstrap-rowlink.min.css" rel="stylesheet">
     <link href="/static/css/kaizen.css" rel="stylesheet">
     <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/bootstrap-rowlink.min.js"></script>
-    <script src="/static/js/bootstrap-typeahead.min.js"></script>
+    <script src="/static/js/bootstrap-rowlink.js"></script>
+    <script src="/static/js/bootstrap-typeahead.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% if title %}
     <title>{{title}}</title>
@@ -19,9 +19,6 @@
     {% endblock %}
   </head>
   <body>
-    <script type=text/javascript>
-      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-    </script>
     <div class="container">
       <div class="navbar">
         <div class="navbar-inner" style="background-color:#dceaf4">
@@ -48,6 +45,9 @@
   </body>
   <footer>
     <hr>
+    <script type=text/javascript>
+      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
     {% block footer %}{% endblock %}
   </footer>
 </html>
