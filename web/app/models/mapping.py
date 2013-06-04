@@ -79,7 +79,7 @@ def visualize_from_null(m):
 
     sites = m.get_all_sites()
     if len(sites) == 0:
-        return visualization
+        return vis
     else:
         vis['site_links'] = {} #maintain this in alphabetical ordering
         vis['note_links'] = {}
@@ -120,6 +120,7 @@ def _make_node(position, radius, **kwargs):
     for key, value in kwargs.items():
         node[key] = value
     return node
+
 def test_visualize(mapname):
     #time should be real time as well. That needs to be displayed.
     return {"sites":[{"notes":[{"text":"qclub and shit lot of costs, etc", "time":100},
