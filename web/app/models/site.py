@@ -12,6 +12,11 @@ class Site(app.db.Model):
     def update_title(self, title):
         self.title = title
 
+    def serialize(self):
+        return {'url'           : self.url,
+                'title'         : self.title,
+                'creation_time' : app.utility.serialize_datetime(self.creation_time)}
+
     def __init__(self, url, title):
         self.url = url
         self.title = title
