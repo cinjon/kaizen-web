@@ -14,6 +14,11 @@ def get_unixtime(_datetime=None):
         return (_datetime - start_date).total_seconds()
     return (datetime.datetime.utcnow() - start_date).total_seconds()
 
+def serialize_datetime(_datetime):
+    if _datetime is None:
+        return None
+    return _datetime.strftime("%Y-%m-%d")
+
 def generate_hash(word):
     return generate_password_hash(word)
 

@@ -17,6 +17,17 @@ class Note(app.db.Model):
         else:
             return app.models.site.create_site(url, title).id
 
+    def serialize(self, include_site=True, include_map=False):
+        ret = {'id'            : self.id,
+               'text'          : self.text,
+               'url'           : self.url,
+               'creation_time' : app.utility.serialize_datetime(self.creation_time)}
+        if include_site:
+            ret['sid'] = self.site_id
+        if include_map:
+            ret['mid'] = self.mapping_id
+        return ret
+
     def __init__(self, binding, mapping_id, text=None, title=None, url=None):
         self.text = text
         self.url = url
