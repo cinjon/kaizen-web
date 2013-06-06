@@ -28,13 +28,6 @@
     <div class="row note-wrapper">
       <div id="map-root"></div>
       <div id="map-note" style="display:hidden">
-        <div class="span1">
-          <div class="row-fluid" id="note-time"></div>
-          <div class="row-fluid">
-            <input class="weight" id="note-weight" type="number" max=10>
-          </div>
-        </div>
-        <div class="span11" id="note-text"></div>
       </div>
       <div id="map-site" style="display:hidden">
         <div class="span1" id="site-weight">
@@ -54,5 +47,5 @@
 
 {% block footer %}
 <script src="/static/js/d3.v3.js"></script>
-<script src="/static/js/user_mapping.js" onload="showMappingVisualization({{json_mapping}}, {{show_canvas}})"></script>
+<script src="/static/js/user_mapping.js" onload="showMappingVisualization({{mapping}}, {{show_canvas}}, {{note_banner}})"></script>
 {% endblock %}
