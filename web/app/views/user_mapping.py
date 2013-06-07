@@ -63,7 +63,6 @@ def user_mapping(uname, mname):
                            mapping=json.dumps(vis),
                            note_banner=json.dumps(note_banner_html()))
 
-
 #TODO(Alex)
 @flask_app.route('/user/<uname>/alex/<mname>', methods=['GET'])
 def user_mapping_alex(uname, mname):

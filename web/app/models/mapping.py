@@ -74,6 +74,28 @@ def visualize(m):
     else:
         return visualize_from_save(m)
 
+def visualize_alex(m):
+    if len(m.notes.all()) == 0:
+        return None
+
+    urls = {}
+    for n in m.notes:
+        s = n.site
+        if s.url not in urls:
+            urls[s.url] = {'title':s.title,
+                           'start_time':app.utility.get_unixtime(n.creation_time)}
+        urls[s.url].setdefault('notes', []).append(
+            {'time':app.utility.get_unixtime(n.creation_time), 'text':n.text})
+
+    time_sorted_urls = sorted(urls.iteritems(), key=lambda (k,v): v['start_time'])
+    latest_time = time_sorted_urls[1][1]['start_time']
+
+    ret = []
+    for url in time_sorted_urls:
+        ret.append({'url':url[0], 'title':url[1]['title'], 'notes':url[1]['notes'],
+                    'radii':(latest_time - url[1]['start_time']) + 60})
+    return ret
+
 def visualize_from_null(m):
     line_weight = 5 #1-10 (noninteger fine)
     node_weight = 5 #1-10 (noninteger fine)
