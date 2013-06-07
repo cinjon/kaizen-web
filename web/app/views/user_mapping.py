@@ -40,6 +40,10 @@ def reindex_note():
     c = request.args.get('targetIndex', 0, type=int)
     return jsonify(result=a + b + c)
 
+def note_banner_html():
+    str1 = "{% set loop_index = 0 %}{% set note = "
+    str2 = "%}{% include 'note_banner.html' %}"
+    return [str1, str2]
 
 @flask_app.route('/user/<uname>/cinjon/<mname>', methods=['GET'])
 def user_mapping(uname, mname):
@@ -54,9 +58,10 @@ def user_mapping(uname, mname):
         return redirect(url_for('user_profile', name=uname))
 
     vis = models.mapping.visualize(m)
-    return render_template('user_mapping.html', mapping=m,
+    return render_template('user_mapping.html',
                            show_canvas=json.dumps(show_canvas),
-                           json_mapping=json.dumps(vis))
+                           mapping=json.dumps(vis),
+                           note_banner=json.dumps(note_banner_html()))
 
 
 #TODO(Alex)
