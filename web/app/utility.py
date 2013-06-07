@@ -1,5 +1,7 @@
 import datetime
 import urllib
+import random
+import string
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify, Response
 
@@ -67,3 +69,6 @@ def unicode_replace(txt):
     txt.replace(u'\u201d', u'"')
     txt.replace(u'\u2014', u'-')
     return txt
+
+def generate_id(size=6):
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(size))
