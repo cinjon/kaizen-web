@@ -25,17 +25,9 @@
 <div class="container-fluid">
   {% if mapping %}
   <div class="row-fluid" id="show-canvas">
-    <div class="row note-wrapper">
-      <div id="map-root"></div>
-      <div id="map-note" style="display:hidden">
-      </div>
-      <div id="map-site" style="display:hidden">
-        <div class="span1" id="site-weight">
-          <input class="weight" id="site-weight" type="number" max=10>
-        </div>
-        <div class="span11" id="site-title"></div>
-      </div>
-    </div>
+    <div id="map-root">{% include "root_banner_nonmodal.html" %}</div>
+    <div id="map-note" style="display:hidden">{% include "note_banner_nonmodal.html" %}</div>
+    <div id="map-site" style="display:hidden">{% include "site_banner_nonmodal.html" %}</div>
     <hr>
     <div class="row-fluid">
       <div class="container-fluid" id="map-sandlot"></div>
@@ -47,5 +39,5 @@
 
 {% block footer %}
 <script src="/static/js/d3.v3.js"></script>
-<script src="/static/js/user_mapping.js" onload="showMappingVisualization({{mapping}}, {{show_canvas}}, {{note_banner}})"></script>
+<script src="/static/js/user_mapping.js" onload="showMappingVisualization({{mapping}}, {{show_canvas}})"></script>
 {% endblock %}

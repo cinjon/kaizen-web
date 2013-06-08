@@ -19,8 +19,7 @@
 
 var svg, width, height, radius;
 var links, notes, sites;
-
-var mapdata, note_banner_html;
+var mapdata;
 
 //tool to connect nodes. false if off, true if on
 var connect_tool_state;
@@ -28,10 +27,9 @@ var connect_tool_state;
 //after selecting a second node, completes the connection and turns off connect_tool
 var connect_tool_node;
 
-function showMappingVisualization(server_data, show, jinja_banner) {
+function showMappingVisualization(server_data, show) {
     if (server_data && show) {
         mapdata = server_data;
-        note_banner_html = jinja_banner;
         display_root();
         start_map_sandlot();
     }
@@ -127,27 +125,31 @@ clean_connect_selection = function() {
 }
 
 display_root = function() {
-    $("#map-root")[0].innerHTML = _display_root_name();
+    $("#rootTitle").html(mapdata.mapping.name);
     $("#map-site").hide();
     $("#map-note").hide();
     $("#map-root").show();
 }
 
-_display_root_name = function() {
-    return '<p style="margin-top:20px; font-size:30px; text-align:center;">' + mapdata.mapping.mapname + '</p>';
-}
-
 display_note = function(_id) {
-    data = mapdata.notes[_id];
-    $("#map-note")[0].innerHTML = note_banner_html[0] + data.note + note_banner_html[1];
+    data = notes[_id];
+    $("#noteId").val(data.nid);
+    $("#mapId").val(mapdata.mapping.mid);
+    $("#noteTime").html('<em><small class="muted">' + data.creation_time + '</small></em>')
+    $("#noteText").html(data.text);
+    $("#noteUrl").attr("title", data.url).html('<a target="_blank" href="' + data.url + '">' + data.url.slice(0, 40) + '</a>')
+    $("#noteName").html(data.nid); //change to data.name when allowing users to submit
     $("#map-site").hide();
     $("#map-root").hide();
     $("#map-note").show();
 }
 
 display_site = function(_id) {
-    data = mapdata.sites[_id];
-    $("#site-title")[0].innerHTML = '<p><a href="' + data.site.url + '">' + data.site.title + '</a></p>';
+    data = sites[_id];
+    $("#siteId").val(data.sid);
+    $("#siteTitle").html(data.title);
+    $("#siteUrl").attr("title", data.url).html('<a target="_blank" href="' + data.url + '">' + data.url.slice(0, 40) + '</a>')
+    $("#siteTime").html(data.creation_time);
     $("#map-note").hide();
     $("#map-root").hide();
     $("#map-site").show();
@@ -325,8 +327,6 @@ connect_node = function(_id) {
 }
 
 make_links = function(maplinks) {
-    console.log('in makelinks');
-    console.log(maplinks);
     for (var index in maplinks) {
         var maplink = maplinks[index];
         var _id1 = maplink[0];
@@ -364,6 +364,35 @@ add_link_to_links = function(link, id1, id2) {
     links[id1].push([link.attr("id"), '1']);
     links[id2].push([link.attr("id"), '2']);
 }
+
+//TODO(Cinjon): Tie this in more with the DB
+$(function() {
+    $('input.nameNote').keyup(function(event){
+        if(event.keyCode == 13){
+            $.getJSON("{{ url_for('name_note') }}", {
+                loopId: $(this).closest('.controls-wrapper').children('.loopId').val(),
+                targetIndex: $(this).val(),
+                mapId: $(this).closest('.controls-wrapper').children('.mapId').val()
+            }, function(data) {
+                window.console.log(data.result);
+            });
+        }
+        return false;
+    });
+});
+
+//TODO(Cinjon): Tie this in more with the DB
+$(function() {
+    $('a.removeNote').bind('click', function() {
+        $.getJSON("{{ url_for('remove_index') }}", {
+            loopId: $(this).closest('.controls-wrapper').children('.loopId').val(),
+            mapId: $(this).closest('.controls-wrapper').children('.mapId').val()
+        }, function(data) {
+            window.console.log(data.result);
+        });
+        return false;
+    });
+});
 
 
 // fitString = function(ctx, str, widthMax) {
