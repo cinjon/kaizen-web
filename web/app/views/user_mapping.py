@@ -9,22 +9,6 @@ show_canvas = True
 #display a saved version at /user/<uname>/<mname>
 #display an edit version at /user/<uname>/edit/<mname>
 
-
-# @flask_app.route('/user/<uname>/<mname>', methods=['GET'])
-# def user_mapping(uname, mname):
-#     u = models.kaizen_user.user_with_name(uname)
-#     if not u:
-#         flash('No user with name %s, should have 404ed' % uname)
-#         return go_to_index()
-#
-#     m = models.mapping.mapping_with_userid_and_name(u.id, mname)
-#     if not m:
-#         flash('No mapping with name %s, should have 404ed' % mname)
-#         return redirect(url_for('user_profile', name=uname))
-#
-#     vis = models.mapping.visualize(m)
-#     return render_template('user_mapping.html', user=u, mapping=json.dumps(vis), mname=json.dumps(m.name), show_canvas=json.dumps(show_canvas))
-
 @flask_app.route('/remove_index', methods=['GET'])
 @login_required
 def remove_index():
@@ -39,11 +23,6 @@ def reindex_note():
     b = request.args.get('mapId', 0, type=int)
     c = request.args.get('targetIndex', 0, type=int)
     return jsonify(result=a + b + c)
-
-def note_banner_html():
-    str1 = "{% set loop_index = 0 %}{% set note = "
-    str2 = "%}{% include 'note_banner.html' %}"
-    return [str1, str2]
 
 @flask_app.route('/user/<uname>/cinjon/<mname>', methods=['GET'])
 def user_mapping(uname, mname):
@@ -60,8 +39,7 @@ def user_mapping(uname, mname):
     vis = models.mapping.visualize(m)
     return render_template('user_mapping.html',
                            show_canvas=json.dumps(show_canvas),
-                           mapping=json.dumps(vis),
-                           note_banner=json.dumps(note_banner_html()))
+                           mapping=json.dumps(vis))
 
 #TODO(Alex)
 @flask_app.route('/user/<uname>/alex/<mname>', methods=['GET'])
