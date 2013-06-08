@@ -32,7 +32,7 @@ class Mapping(app.db.Model):
         return list(sites)
 
     def serialize(self, include_notes=False, include_user=False):
-        ret = {'id'   : self.id,
+        ret = {'mid'   : self.id,
                'name' : self.name}
         if include_user:
             ret['uid'] = self.kaizen_user_id

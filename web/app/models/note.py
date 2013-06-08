@@ -18,9 +18,10 @@ class Note(app.db.Model):
             return app.models.site.create_site(url, title).id
 
     def serialize(self, include_site=True, include_map=False):
-        ret = {'id'            : self.id,
+        ret = {'nid'           : self.id,
                'text'          : self.text,
                'url'           : self.url,
+               'name'          : self.id, #user submits this
                'creation_time' : app.utility.serialize_datetime(self.creation_time)}
         if include_site:
             ret['sid'] = self.site_id
