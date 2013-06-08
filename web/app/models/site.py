@@ -13,7 +13,8 @@ class Site(app.db.Model):
         self.title = title
 
     def serialize(self):
-        return {'url'           : self.url,
+        return {'sid'           : self.id,
+                'url'           : self.url,
                 'title'         : self.title,
                 'creation_time' : app.utility.serialize_datetime(self.creation_time)}
 
