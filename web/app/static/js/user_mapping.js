@@ -30,8 +30,8 @@ var connect_tool_node;
 function showMappingVisualization(server_data, show) {
     if (server_data && show) {
         mapdata = server_data;
-        display_root();
         start_map_sandlot();
+        display_root();
     }
 }
 
@@ -111,9 +111,8 @@ _make_connection_tool = function() {
 
 connect_tool_click = function() {
     connect_tool_state = !connect_tool_state
-    console.log(connect_tool_state);
     if (connect_tool_state) {
-        $("#tconnectTool").text("Connect On");
+        $("#tconnectTool").text("Select Start");
     } else {
         $("#tconnectTool").text("Connect Off");
         clean_connect_selection();
@@ -126,6 +125,10 @@ clean_connect_selection = function() {
 
 display_root = function() {
     $("#rootTitle").html(mapdata.mapping.name);
+    console.log(sites);
+    console.log(notes);
+    $("#rootCountSites").html("<p>Sites: " + Object.size(sites) + "</p>");
+    $("#rootCountNotes").html("<p>Notes: " + Object.size(notes) + "</p>");
     $("#map-site").hide();
     $("#map-note").hide();
     $("#map-root").show();
@@ -370,9 +373,8 @@ $(function() {
     $('input.nameNote').keyup(function(event){
         if(event.keyCode == 13){
             $.getJSON("{{ url_for('name_note') }}", {
-                loopId: $(this).closest('.controls-wrapper').children('.loopId').val(),
-                targetIndex: $(this).val(),
-                mapId: $(this).closest('.controls-wrapper').children('.mapId').val()
+                noteId: $("#noteId").val(),
+                newName: $(this).val()
             }, function(data) {
                 window.console.log(data.result);
             });
@@ -394,6 +396,13 @@ $(function() {
     });
 });
 
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
 
 // fitString = function(ctx, str, widthMax) {
 //     var textBlock = [];
