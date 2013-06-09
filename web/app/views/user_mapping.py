@@ -24,6 +24,20 @@ def reindex_note():
     c = request.args.get('targetIndex', 0, type=int)
     return jsonify(result=a + b + c)
 
+@flask_app.route('/name_note')
+@login_required
+def name_note():
+    note_id = request.args.get('noteId', 0, type=int)
+    new_name = request.args.get('newName', None, type=str)
+    #TODO(cinjon) do something with name here
+
+@flask_app.route('/name_site')
+@login_required
+def name_site():
+    note_id = request.args.get('noteId', 0, type=int)
+    new_name = request.args.get('newName', None, type=str)
+    #TODO(cinjon) do something with name here
+
 @flask_app.route('/user/<uname>/cinjon/<mname>', methods=['GET'])
 def user_mapping(uname, mname):
     u = models.kaizen_user.user_with_name(uname)
