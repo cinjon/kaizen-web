@@ -14,9 +14,7 @@ STATUS_ACTIVE = 'active'
 
 class KaizenUser(app.db.Model, UserMixin):
     id = app.db.Column(app.db.Integer, primary_key=True)
-    first = app.db.Column(app.db.String(64)) #Required
-    last = app.db.Column(app.db.String(64)) #Required
-    name = app.db.Column(app.db.String(120)) #Should be unique by design, but not set to be here.
+    name = app.db.Column(app.db.String(120), unique=True)
     email = app.db.Column(app.db.String(120), unique=True, index=True) #Required
     password = app.db.Column(app.db.String(100)) #Required
     active = app.db.Column(app.db.Boolean())
@@ -31,15 +29,12 @@ class KaizenUser(app.db.Model, UserMixin):
                             backref=app.db.backref('users', lazy='dynamic'))
     mappings = app.db.relationship('Mapping', backref='user', lazy='dynamic')
 
-    def __init__(self, first, last, email, password, roles, active):
-        self.first = first
-        self.last = last
+    def __init__(self, name, email, password, active):
         self.email = email
+        self.name = name
         self.active = active
         self.password = self.set_password(password)
         self.creation_time = app.utility.get_time()
-        self.name = self.set_name(first, last)
-        self.roles = roles
 
     def is_authenticated(self):
         #Can the user be logged in in general?
@@ -54,14 +49,6 @@ class KaizenUser(app.db.Model, UserMixin):
 
     def get_id(self):
         return unicode(self.id)
-
-    def set_name(self, first, last):
-        name = first + '_' + last
-        count = len(KaizenUser.query.filter(and_(KaizenUser.first==first, KaizenUser.last==last)).all())
-        if count > 0:
-            return name + '-' + str(count)
-        else:
-            return name
 
     def set_password(self, password):
         return app.utility.generate_hash(password)
@@ -118,10 +105,10 @@ class KaizenUser(app.db.Model, UserMixin):
         return sum([len(m.notes.all()) for m in self.mappings])
 
     def __repr__(self):
-        return '%s %s' % (self.first, self.last)
+        return self.name
 
-def create_user(first, last, email, password, role=ROLE_USER, active=True):
-    user = KaizenUser(first=first, last=last, email=email, password=password, role=role, active=active)
+def create_user(name, email, password, active=True):
+    user = KaizenUser(name=name, email=email, password=password, active=active)
     app.models.sql.add(user)
     return user
 
@@ -154,9 +141,9 @@ def try_login(email, password, remember_me=True, xhr=False):
 def authenticate(u, password):
     return u.check_password(password)
 
-def try_register(email, password, first, last, xhr=False):
+def try_register(email, password, name, xhr=False):
     if not user_with_email(email):
-        app.security_ds.create_user(email=email, password=password, first=first, last=last)
+        app.security_ds.create_user(email=email, password=password, name=name)
         app.security_ds.commit()
         flash(app.messages.EMAIL_VALIDATION_SENT, 'info')
     return try_login(email, password, xhr=xhr)
@@ -164,4 +151,3 @@ def try_register(email, password, first, last, xhr=False):
 def all_users_sorted_by_note_total():
     users = KaizenUser.query.all()
     return sorted(users, key=lambda x: x.number_of_notes())
-
