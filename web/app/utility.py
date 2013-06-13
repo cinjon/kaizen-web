@@ -40,7 +40,7 @@ def xhr_response(data, code):
 def xhr_user_login(u, success):
     if success:
         return xhr_response({'bindings':u.get_json_mappings(),
-                             'first':u.first, 'last':u.last}, 202)
+                             'accountName':u.name}, 202)
     return xhr_response({}, 401)
 
 def xhr_user_register(u, success):

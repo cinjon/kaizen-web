@@ -60,14 +60,8 @@
                           name="register_user_form">
                         {{ register_user_form.hidden_tag() }}
                         <div class="row-fluid formBox">
-                            {{ register_user_form.first(size=60, placeholder="First") }}
-                            {% for error in register_user_form.errors.first %}
-                                <span style="color:red">[{{ error }}]</span>
-                            {% endfor %}
-                        </div>
-                        <div class="row-fluid formBox">
-                            {{ register_user_form.last(size=60, placeholder="Last") }}
-                            {% for error in register_user_form.errors.last %}
+                            {{ register_user_form.name(size=60, placeholder="Name") }}
+                            {% for error in register_user_form.errors.name %}
                                 <span style="color:red">[{{ error }}]</span>
                             {% endfor %}
                         </div>
