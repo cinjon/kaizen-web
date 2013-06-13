@@ -6,12 +6,20 @@ class Link(app.db.Model):
     end_nid   = app.db.Column(app.db.Integer, app.db.ForeignKey('node.id'), index=True)
     vid    = app.db.Column(app.db.Integer, app.db.ForeignKey('visualization.id'), index=True)
 
-    def __index__(start_nid, end_nid, vid):
+    def __init__(self, start_nid, end_nid, vid):
         self.start_nid = start_nid
         self.end_nid   = end_nid
         self.vid = vid
 
-def create_link(start_nid, end_nid, vis_id):
-    link = Link(start_nid, end_nid, vis_id)
+    def serialize(self):
+        start_node = app.models.node.Node.query.get(self.start_nid)
+        end_node   = app.models.node.Node.query.get(self.end_nid)
+        return (start_node.dom_id, start_node.x, start_node.y,
+                end_node.dom_id, end_node.x, end_node.y)
+
+def create_link(start_nid, end_nid, vid):
+    link = Link(start_nid, end_nid, vid)
+    app.models.sql.add(link)
+    return link
 
 
