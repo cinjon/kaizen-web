@@ -51,4 +51,5 @@ def create_note(text, title, url, mapping_id, binding=-1):
     note = Note(text=text, title=title, url=url,
                 mapping_id=mapping_id, binding=binding)
     app.models.sql.add(note)
+    app.models.node.post_visualized_create_note(mapping_id, note)
     return note
