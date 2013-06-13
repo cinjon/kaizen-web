@@ -8,6 +8,18 @@ class Note(app.db.Model):
     binding = app.db.Column(app.db.SmallInteger)
     mapping_id = app.db.Column(app.db.Integer, app.db.ForeignKey('mapping.id'), index=True)
     site_id = app.db.Column(app.db.Integer, app.db.ForeignKey('site.id'), index=True)
+    deleted = app.db.Column(app.db.Boolean)
+    name = app.db.Column(app.db.String(120))
+
+    def __init__(self, binding, mapping_id, text=None, title=None, url=None, deleted=False, name=None):
+        self.text = text
+        self.url = url
+        self.binding = binding
+        self.mapping_id = mapping_id
+        self.site_id = self.set_site_id(url, title)
+        self.creation_time = app.utility.get_time()
+        self.deleted = deleted
+        self.name = name
 
     def set_site_id(self, url, title):
         s = app.models.site.Site.query.filter(app.models.site.Site.url == url).first()
@@ -18,24 +30,17 @@ class Note(app.db.Model):
             return app.models.site.create_site(url, title).id
 
     def serialize(self, include_site=True, include_map=False):
-        ret = {'nid'           : self.id,
-               'text'          : self.text,
-               'url'           : self.url,
-               'name'          : self.id, #user submits this
-               'creation_time' : app.utility.serialize_datetime(self.creation_time)}
+        ret = {}
+        ret['name'] = self.name
+        ret['nid'] = self.id
+        ret['text'] = self.text
+        ret['url'] = self.url
+        ret['creation_time'] = app.utility.serialize_datetime(self.creation_time)
         if include_site:
             ret['sid'] = self.site_id
         if include_map:
             ret['mid'] = self.mapping_id
         return ret
-
-    def __init__(self, binding, mapping_id, text=None, title=None, url=None):
-        self.text = text
-        self.url = url
-        self.binding = binding
-        self.mapping_id = mapping_id
-        self.site_id = self.set_site_id(url, title)
-        self.creation_time = app.utility.get_time()
 
     def __unicode__(self):
         if len(self.text) > 50:
@@ -46,3 +51,4 @@ def create_note(text, title, url, mapping_id, binding=-1):
     note = Note(text=text, title=title, url=url,
                 mapping_id=mapping_id, binding=binding)
     app.models.sql.add(note)
+    return note

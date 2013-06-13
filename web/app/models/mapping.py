@@ -2,8 +2,6 @@ import app
 import math
 from sqlalchemy import and_
 
-start_visualization_from_blank = True
-
 class Mapping(app.db.Model):
     id = app.db.Column(app.db.Integer, primary_key=True)
     creation_time = app.db.Column(app.db.DateTime)
@@ -11,6 +9,14 @@ class Mapping(app.db.Model):
     kaizen_user_id = app.db.Column(app.db.Integer, app.db.ForeignKey('kaizen_user.id'), index=True)
     binding = app.db.Column(app.db.SmallInteger)
     notes = app.db.relationship('Note', backref='mapping', lazy='dynamic')
+    deleted = app.db.Column(app.db.Boolean)
+
+    def __init__(self, name, kaizen_user_id, binding, deleted=False):
+        self.name = name
+        self.kaizen_user_id = kaizen_user_id
+        self.binding = binding
+        self.creation_time = app.utility.get_time()
+        self.deleted = deleted
 
     def set_binding(self, binding):
         self.binding = binding
@@ -20,8 +26,6 @@ class Mapping(app.db.Model):
         text = app.utility.decodeJS(data['text'])
         title = app.utility.decodeJS(data['title'])
         href = app.utility.decodeJS(data['href'])
-        if 'ugn' in data: #TODO: userGeneratedNote
-            pass
         app.models.note.create_note(text, title, href, self.id, keyCode)
 
     def get_all_notes(self):
@@ -39,12 +43,6 @@ class Mapping(app.db.Model):
         if include_notes:
             ret['notes'] = [note.serialize() for note in self.notes]
         return ret
-
-    def __init__(self, name, kaizen_user_id, binding):
-        self.name = name
-        self.kaizen_user_id = kaizen_user_id
-        self.binding = binding
-        self.creation_time = app.utility.get_time()
 
     def __repr__(self):
         return self.name
@@ -68,64 +66,57 @@ def mapping_with_userid_and_name(uid, name):
         return filtered[0]
     return None
 
+def mapping_with_id(id):
+    return Mapping.query.get(id)
+
 def visualize(m):
-    if start_visualization_from_blank:
-        return visualize_from_null(m)
+    v = app.models.visualization.visualization_with_id(m.id)
+    if v:
+        return visualize_from_save(v)
     else:
-        return visualize_from_save(m)
-
-def visualize_alex(m):
-    if len(m.notes.all()) == 0:
-        return None
-
-    urls = {}
-    for n in m.notes:
-        s = n.site
-        if s.url not in urls:
-            urls[s.url] = {'title':s.title,
-                           'start_time':app.utility.get_unixtime(n.creation_time)}
-        urls[s.url].setdefault('notes', []).append(
-            {'time':app.utility.get_unixtime(n.creation_time), 'text':n.text})
-
-    time_sorted_urls = sorted(urls.iteritems(), key=lambda (k,v): v['start_time'])
-    latest_time = time_sorted_urls[1][1]['start_time']
-
-    ret = []
-    for url in time_sorted_urls:
-        ret.append({'url':url[0], 'title':url[1]['title'], 'notes':url[1]['notes'],
-                    'radii':(latest_time - url[1]['start_time']) + 60})
-    return ret
+        return visualize_from_null(m)
 
 def visualize_from_null(m):
-    line_weight = 5 #1-10 (noninteger fine)
-    node_weight = 5 #1-10 (noninteger fine)
     width = 1050
     height = 600
     root_id = app.utility.generate_id()
     root_distance = max(width/5, height/5)
-    root_position = (width/2, height/2)
-    root_radius   = max(node_weight*6, min(math.sqrt(width), math.sqrt(height)))
+    root_x = width/2
+    root_y = height/2
+    root_r = max(40, min(math.sqrt(width), math.sqrt(height)))
+    site_r = root_r - 10
     note_distance = root_distance / 3
-    note_radius   = root_radius * 2 / 5
-    vis = {'mapping':m.serialize(include_notes=False), 'root':_make_node(root_position, root_radius, _id=root_id)}
+    note_r   = site_r * 2 / 5
+
+    #****#
+    v = app.models.visualization.create_visualization(m.id)
+    ret = v.serialize() #building along here because otherwise we'll have to loop down everything twice, once to build the nodes, the other to build the return
+    root_node = app.models.node.create_node(vid=m.id, x=root_x, y=root_y, radius=root_r,
+                                            node_type=app.models.node.NodeTypes.MAPPING,
+                                            node_type_id=m.id)
+    ret['root'] = root_node.serialize()
 
     sites = m.get_all_sites()
     if len(sites) == 0:
-        return vis
+        return ret
     else:
-        vis['links'] = []
-        vis['sites'] = {}
-        vis['notes'] = {}
+        ret['links'] = []
+        ret['sites'] = {}
+        ret['notes'] = {}
 
     angle_s = 2 * math.pi / len(sites)
     for i, site in enumerate(sites):
         angle_spos = i * angle_s
-        scx = root_position[0] + math.cos(angle_spos) * (root_radius + root_distance)
-        scy = root_position[1] + math.sin(angle_spos) * (root_radius + root_distance)
-        sid = app.utility.generate_id()
-        vis['sites'][sid] = _make_node((scx, scy), root_radius, site=site.serialize())
-        vis['links'].append((root_id, root_position[0], root_position[1],
-                             sid, scx, scy, line_weight))
+        scx = root_x + math.cos(angle_spos) * (root_r + root_distance)
+        scy = root_y + math.sin(angle_spos) * (root_r + root_distance)
+
+        site_node = app.models.node.create_node(vid=m.id, x=scx, y=scy, radius=site_r,
+                                                node_type=app.models.node.NodeTypes.SITE,
+                                                node_type_id=site.id)
+        ret['sites'][site_node.dom_id] = site_node.serialize()
+        link = app.models.link.create_link(start_nid=root_node.id,
+                                           end_nid=site_node.id, vid=m.id)
+        ret['links'].append(link.serialize())
 
         notes = site.notes.all()
         if len(notes) > 0:
@@ -136,25 +127,18 @@ def visualize_from_null(m):
                 ncx = -1
                 ncy = -1
                 while (ncx < 0 or ncx > width or ncy < 0 or ncy > height):
-                    ncx = scx + math.cos(angle_npos - angle_spos * angle_counter) * (root_radius + note_distance)
-                    ncy = scy + math.sin(angle_npos - angle_spos * angle_counter) * (root_radius + note_distance)
+                    ncx = scx + math.cos(angle_npos - angle_spos * angle_counter) * (site_r + note_distance)
+                    ncy = scy + math.sin(angle_npos - angle_spos * angle_counter) * (site_r + note_distance)
                     angle_counter += 1
-                nid = app.utility.generate_id()
-                vis['notes'][nid] = _make_node((ncx, ncy), note_radius, note=note.serialize())
-                vis['links'].append((sid, scx, scy,
-                                     nid, ncx, ncy, line_weight))
-    return vis
 
-def visualize_from_save(m):
-    #TODO
-    return {}
+                note_node = app.models.node.create_node(vid=m.id, x=ncx, y=ncy, radius=note_r,
+                                                        node_type=app.models.node.NodeTypes.NOTE,
+                                                        node_type_id=note.id)
+                link = app.models.link.create_link(start_nid=site_node.id,
+                                                   end_nid=note_node.id, vid=m.id)
+                ret['notes'][note_node.dom_id] = note_node.serialize()
+                ret['links'].append(link.serialize())
+    return ret
 
-def _make_node(position, radius, **kwargs):
-    node = {'position':position, 'radius':radius}
-    for key, value in kwargs.items():
-        node[key] = value
-    return node
-
-
-
-
+def visualize_from_save(v):
+    return v.serialize_recursively()
