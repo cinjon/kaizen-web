@@ -24,19 +24,36 @@ def reindex_note():
     c = request.args.get('targetIndex', 0, type=int)
     return jsonify(result=a + b + c)
 
+@flask_app.route('/delete_note')
+@login_required
+def delete_note():
+    note_id = request.args.get('noteId', 0, type=int)
+    print 'note_id in delete_note: %s' % note_id
+    return jsonify(result=note_id)
+
 @flask_app.route('/name_note')
 @login_required
 def name_note():
     note_id = request.args.get('noteId', 0, type=int)
     new_name = request.args.get('newName', None, type=str)
     #TODO(cinjon) do something with name here
+    print 'in name_note, note_id: %s, new_name: %s' % (note_id, new_name)
+    return jsonify(result=new_name)
+
+@flask_app.route('/delete_site')
+@login_required
+def delete_site():
+    site_id = request.args.get('siteId', 0, type=int)
+    print 'in del site: %s' % site_id
 
 @flask_app.route('/name_site')
 @login_required
 def name_site():
-    note_id = request.args.get('noteId', 0, type=int)
+    site_id = request.args.get('siteId', 0, type=int)
     new_name = request.args.get('newName', None, type=str)
     #TODO(cinjon) do something with name here
+    print 'in name_site, site_id: %s, new_name: %s' % (site_id, new_name)
+    return jsonify(result=new_name)
 
 @flask_app.route('/user/<uname>/cinjon/<mname>', methods=['GET'])
 def user_mapping(uname, mname):

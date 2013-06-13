@@ -20,12 +20,7 @@
 var svg, width, height, radius;
 var links, notes, sites;
 var mapdata;
-
-//tool to connect nodes. false if off, true if on
-var connect_tool_state;
-//a node if one has been selected via connect_tool
-//after selecting a second node, completes the connection and turns off connect_tool
-var connect_tool_node;
+var connect_tool_state, delete_obj_tool_state;
 
 function showMappingVisualization(server_data, show) {
     if (server_data && show) {
@@ -42,7 +37,6 @@ start_map_sandlot = function() {
         .style("width", width)
         .style("height", height);
 
-    make_tools();
     make_links(mapdata.links);
     make_root(mapdata.root, mapdata.mapping.name);
     make_sites(mapdata.sites);
@@ -54,9 +48,9 @@ set_initial_conditions = function(sandlot) {
         width = 1050; //width = sandlot.width();
         height = 600;
     };
-    set_connect_tool = function() {
+    set_tool_states = function() {
         connect_tool_state = false;
-        connect_tool_node = null;
+        delete_obj_tool_state = false;
     }
     set_objects = function() {
         links = {};
@@ -66,11 +60,21 @@ set_initial_conditions = function(sandlot) {
 
     set_dimensions(sandlot);
     set_objects();
-    set_connect_tool();
+    set_tool_states();
 };
 
 is_connect_node = function(node) {
-    if (connect_tool_state && connect_tool_node && node.attr("id") == connect_tool_node.attr("id")) {
+    if (connect_tool_state && node.attr("class").indexOf("connect_from") !== -1) {
+        return true;
+    }
+    return false;
+}
+
+is_connected = function(node_s, node_e) {
+    //Change later to differentiate between direction
+    id_s = node_s.attr("id");
+    id_e = node_e.attr("id");
+    if (id_s == id_e || id_s in links[id_e] || id_e in links[id_s]) {
         return true;
     }
     return false;
@@ -88,45 +92,68 @@ mouseout = function(node, color) {
     }
 }
 
-make_tools = function() {
-    _make_connection_tool();
-}
+$(function() {
+    $('#add_connect_tool').bind('click', add_connect_tool_click);
+});
 
-_make_connection_tool = function() {
-    var x, y, w, h;
-    x = 8;
-    y = 18;
-    w = 90;
-    h = 40;
-    var tool = svg.append("svg:rect")
-        .attr("x", x).attr("y", y)
-        .attr("width", w+4).attr("height", h+4)
-        .attr("fill", "#dceaf4").attr("id", "connectTool")
-        .attr("rx", 7).attr("ry", 7)
-        .on("click", connect_tool_click)
-        .on("mouseover", function() {d3.select(this).style("fill", "gray");})
-        .on("mouseout", function() {d3.select(this).style("fill", "#dceaf4");});
-    var text = make_node_text("t" + tool.attr("id"), "Connect Off", x+2, y+h/2+5, connect_tool_click, "blue");
-}
+$(function() {
+    $('#delete_obj_tool').bind('click', del_obj_tool_click);
+});
 
-connect_tool_click = function() {
-    connect_tool_state = !connect_tool_state
-    if (connect_tool_state) {
-        $("#tconnectTool").text("Select Start");
+$(function() {
+    $('#save_state_tool').bind('click', save_state_tool_click);
+});
+
+add_connect_tool_click = function() {
+    if (!connect_tool_state) {
+        connect_tool_state = true;
+        $("#add_connect_tool").text("Connect On");
+        turn_off_delete_tool();
     } else {
-        $("#tconnectTool").text("Connect Off");
-        clean_connect_selection();
+        turn_off_connect_tool();
     }
 }
 
-clean_connect_selection = function() {
-    connect_tool_node = null;
+turn_off_connect_tool = function() {
+    if (connect_tool_state) {
+        connect_tool_state = false;
+        $("#add_connect_tool").text("Connect Off");
+        $("#add_connect_tool").button('toggle');
+    }
+    var connect_tool_node = $('[class*="connect_node"]');
+    if (connect_tool_node.length > 0) {
+        var node_class = connect_tool_node.attr("class");
+        connect_tool_node.attr("class", node_class.slice(0, -13));
+        connect_tool_node.attr("fill", "wheat");
+    }
+}
+
+del_obj_tool_click = function() {
+    if (!delete_obj_tool_state) {
+        delete_obj_tool_state = true;
+        $("#delete_obj_tool").text("Delete On");
+        turn_off_connect_tool();
+    } else {
+        turn_off_delete_tool();
+    }
+}
+
+turn_off_delete_tool = function() {
+    if (delete_obj_tool_state) {
+        delete_obj_tool_state = false;
+        $("#delete_obj_tool").text("Delete Off");
+        $("#delete_obj_tool").button('toggle');
+    }
+}
+
+save_state_tool_click = function() {
+    console.log('save shit to the server');
+    $("#save_state_tool").button('loading');
+    //
 }
 
 display_root = function() {
     $("#rootTitle").html(mapdata.mapping.name);
-    console.log(sites);
-    console.log(notes);
     $("#rootCountSites").html("<p>Sites: " + Object.size(sites) + "</p>");
     $("#rootCountNotes").html("<p>Notes: " + Object.size(notes) + "</p>");
     $("#map-site").hide();
@@ -164,9 +191,9 @@ drag = function(move) {
 
 move_links = function(node) {
     nodelinks = links[node.attr("id")];
-    for (var index in nodelinks) {
-        var link = $("#" + nodelinks[index][0]);
-        var end  = nodelinks[index][1];
+    for (var link_id in nodelinks) {
+        var link = $("#" + link_id);
+        var end  = nodelinks[link_id];
         link.attr("x" + end, node.attr("link_x"))
             .attr("y" + end, node.attr("link_y"));
     }
@@ -209,7 +236,8 @@ move_note = function() {
 
 make_root = function(maproot, name) {
     var circle, text, click_func;
-    click_func = function() {return display_root();};
+    console.log(maproot);
+    click_func = function() {return click(display_root, maproot._id);};
     circle = svg.append("svg:circle")
         .attr("class", "rootNode")
         .attr("id", maproot._id)
@@ -235,7 +263,7 @@ make_sites = function(mapsites) {
 
 make_site = function(_id, name, position, radius) {
     var circle, text, click_func;
-    click_func = function() {return click(connect_node, display_site, _id);};
+    click_func = function() {return click(display_site, _id);};
     circle = svg.append("svg:circle")
         .attr("class", "siteNode")
         .attr("id", _id)
@@ -244,10 +272,11 @@ make_site = function(_id, name, position, radius) {
         .attr("cy", position[1])
         .attr("link_x", position[0])
         .attr("link_y", position[1])
-        .attr("fill", "#0772A1")
+        .attr("fill", "wheat") //#0772A1
+        .attr("opacity", .8)
         .on("click", click_func)
         .on("mouseover", function() {mouseover(d3.select(this), "gray");})
-        .on("mouseout", function() {mouseout(d3.select(this), "#0772A1");})
+        .on("mouseout", function() {mouseout(d3.select(this), "wheat");})
         .call(drag(move_site));
     text = make_node_text("t" + _id, name, position[0]-radius, position[1], click_func);
 }
@@ -261,7 +290,7 @@ make_notes = function(mapnotes) {
 
 make_note = function(_id, name, position, radius) {
     var side = 30;
-    var click_func = function() {return click(connect_node, display_note, _id);};
+    var click_func = function() {return click(display_note, _id);};
     var rect = svg.append("svg:rect")
         .attr("class", "noteNode")
         .attr("id", _id)
@@ -271,14 +300,14 @@ make_note = function(_id, name, position, radius) {
         .attr("link_y", position[1] - side/2)
         .attr("width", side)
         .attr("height", side)
-        .attr("fill", "rgb(6,120,155)") //#FF7340
+        .attr("fill", "wheat") //rgb(6,120,155)
         .attr("rx", 7)
         .attr("ry", 7)
         .attr("stroke-width", 5)
         .attr("opacity", .6)
         .on("click", click_func)
         .on("mouseover", function() {mouseover(d3.select(this), "gray");})
-        .on("mouseout", function() {mouseout(d3.select(this), "rgb(6,120,155)");})
+        .on("mouseout", function() {mouseout(d3.select(this), "wheat");})
         .call(drag(move_note));
     var text = make_node_text("t" + _id, name, position[0] - side/2, position[1], click_func);
 
@@ -303,31 +332,36 @@ make_node_text = function(_id, name, x, y, click_func, color) {
     return text;
 };
 
-click = function(_do_connect, _do_click, _id) {
-    if (connect_tool_state && _do_connect) {
-        return _do_connect(_id);
-    }
-    else if (_do_click) {
-        return _do_click(_id);
+click = function(_default_click, _id) {
+    if (connect_tool_state) {
+        return connect_node(_id);
+    } else if (delete_obj_tool_state) {
+        return delete_obj(_id);
+    } else if (_default_click) {
+        return _default_click(_id);
     }
     return;
 }
 
-//When unique str id, make just one connect func
 connect_node = function(_id) {
     var node = $("#" + _id);
-    if (connect_tool_node == null) {
-        node.attr("fill", "#FF7340");
-        connect_tool_node = node;
-        console.log('set connect_tool_ndoe to node');
-        console.log(connect_tool_node);
-        console.log(node.attr("id"));
-    } else {
+    var connect_tool_node = $('[class*="connect_node"]');
+    if (connect_tool_node.length == 0) {
+        var node_class = node.attr("class");
+        node.attr("class", node_class + " connect_node");
+        node.attr("fill", "#FF0000");
+    } else if (!is_connected(node, connect_tool_node)) {
         make_link(connect_tool_node.attr("link_x"), connect_tool_node.attr("link_y"),
                   node.attr("link_x"), node.attr("link_y"),
                   connect_tool_node.attr("id"), node.attr("id"));
+        turn_off_connect_tool();
     }
 }
+
+delete_obj = function(_id) {
+    console.log('hey deleting this obj: ' + _id);
+    //
+};
 
 make_links = function(maplinks) {
     for (var index in maplinks) {
@@ -358,17 +392,16 @@ make_link = function(e1x, e1y, e2x, e2y, e1id, e2id, weight) {
 
 add_link_to_links = function(link, id1, id2) {
     if (!(id1 in links)) {
-        links[id1] = [];
+        links[id1] = {}
     }
     if (!(id2 in links)) {
-        links[id2] = [];
+        links[id2] = {};
     }
     //can i push the object instead? how do i access it afterward...
-    links[id1].push([link.attr("id"), '1']);
-    links[id2].push([link.attr("id"), '2']);
+    links[id1][link.attr("id")] = '1';
+    links[id2][link.attr("id")] = '2';
 }
 
-//TODO(Cinjon): Tie this in more with the DB
 $(function() {
     $('input.nameNote').keyup(function(event){
         if(event.keyCode == 13){
@@ -383,14 +416,38 @@ $(function() {
     });
 });
 
-//TODO(Cinjon): Tie this in more with the DB
 $(function() {
-    $('a.removeNote').bind('click', function() {
-        $.getJSON("{{ url_for('remove_index') }}", {
-            loopId: $(this).closest('.controls-wrapper').children('.loopId').val(),
-            mapId: $(this).closest('.controls-wrapper').children('.mapId').val()
+    $('input.nameSite').keyup(function(event){
+        if(event.keyCode == 13){
+            $.getJSON("{{ url_for('name_site') }}", {
+                noteId: $("#siteId").val(),
+                newName: $(this).val()
+            }, function(data) {
+                //do something with return
+                window.console.log(data.result);
+            });
+        }
+        return false;
+    });
+});
+
+$(function() {
+    $('a.deleteNote').bind('click', function() {
+        $.getJSON("{{ url_for('delete_note') }}", {
+            noteId: $(this).closest('.controls-wrapper').children('.noteId').val()
         }, function(data) {
             window.console.log(data.result);
+        });
+        return false;
+    });
+});
+
+$(function() {
+    $('a.deleteSite').bind('click', function() {
+        $.getJSON("{{ url_for('delete_site') }}", {
+            siteId: $(this).closest('.controls-wrapper').children('.siteId').val()
+        }, function(data) {
+            //remove Stuff from svg here
         });
         return false;
     });
