@@ -85,7 +85,7 @@ def visualize_from_null(m):
     root_y = height/2
     root_r = max(40, min(math.sqrt(width), math.sqrt(height)))
     site_r = root_r - 10
-    note_distance = root_distance / 3
+    note_distance = root_distance / 4
     note_r   = site_r * 2 / 5
 
     #****#
