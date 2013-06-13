@@ -14,7 +14,6 @@ class Visualization(app.db.Model):
         return {'mapping':app.models.mapping.mapping_with_id(self.id).serialize(include_notes=False)}
 
     def serialize_recursively(self):
-        print "i am recursively serializing"
         ret = self.serialize()
         ret['links'] = [link.serialize() for link in self.links]
         ret['sites'] = {}
@@ -30,8 +29,10 @@ class Visualization(app.db.Model):
             elif node.node_type == app.models.node.NodeTypes.MAPPING:
                 ser['_id'] = node.dom_id
                 ret['root'] = ser
-        print ret
         return ret
+
+    def __repr__(self):
+        return '%d %s' % (self.id, self.last_save_time)
 
 def create_visualization(id):
     vis = Visualization(id)
