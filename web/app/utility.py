@@ -72,3 +72,6 @@ def unicode_replace(txt):
 
 def generate_id(size=6):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(size))
+
+def enum(**enums):
+    return type('Enum', (), enums)
