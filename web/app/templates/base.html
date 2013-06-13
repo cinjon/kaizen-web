@@ -30,7 +30,7 @@
           <a class="brand" href="{{ url_for('index') }}">Kaizen</a>
           {% if g.user %}
           <ul class="nav">
-            <li><a href="{{ url_for('user_profile_owner', name=g.user.name) }}">{{g.user.first}} {{g.user.last}}</a></li>
+            <li><a href="{{ url_for('user_profile_owner', name=g.user.name) }}">{{g.user.name}}</a></li>
             <li><a href="{{ url_for_security('logout') }}">Logout</a></li>
           </ul>
           {% endif %}
