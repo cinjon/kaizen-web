@@ -149,7 +149,57 @@ turn_off_delete_tool = function() {
 save_state_tool_click = function() {
     console.log('save shit to the server');
     $("#save_state_tool").button('loading');
-    //
+    $.getJSON("{{ url_for('save_state') }}", {
+        sites: _save_nodes_json(sites, 'sites'),
+        notes: _save_nodes_json(notes, 'notes'),
+        root : _root_json()
+//         links: _link_json()
+    }, function(response) {
+        //toggle button back
+        console.log('hey yo, responded');
+        $("#save_state_tool").button();
+        console.log(response.result);
+    });
+}
+
+_position_from_dom = function(dom) {
+    return {'x':dom.attr("link_x"), 'y':dom.attr("link_y")};
+}
+
+_save_nodes_json = function(nodes, ty) {
+    console.log(mapdata[ty]);
+    console.log(ty);
+    console.log(nodes);
+    var _id, node, ret;
+    ret = {};
+    for (_id in nodes) {
+        node = nodes[_id];
+        if (node.deleted) {
+            ret[_id] = 'deleted';
+        } else {
+            var new_position, original_position;
+            new_position = _position_from_dom($('#' + _id));
+            original_position = mapdata[ty][_id].position;
+            console.log('id: ' + _id + ', original_position: ' + original_position + ', new_position: (' + new_position.x + ',' + new_position.y + ')');
+            if (new_position.x != original_position[0] || new_position.y != original_position[1]) {
+                ret[_id] = (new_position.x, new_position.y);
+            }
+        }
+    }
+    console.log(ret);
+    return ret;
+}
+
+_root_json = function() {
+    var _id, x, y, original_position;
+    _id = mapdata.root._id;
+    original_position = mapdata.root.position;
+    x, y = _position_from_dom($('#' + _id));
+    if (x !== original_position[0] || y !== original_position[1]) {
+        return (x, y);
+    } else {
+        return null;
+    }
 }
 
 display_root = function() {
@@ -236,7 +286,6 @@ move_note = function() {
 
 make_root = function(maproot, name) {
     var circle, text, click_func;
-    console.log(maproot);
     click_func = function() {return click(display_root, maproot._id);};
     circle = svg.append("svg:circle")
         .attr("class", "rootNode")
@@ -258,6 +307,8 @@ make_sites = function(mapsites) {
         //replace name (second key) with some name
         make_site(key, key, mapsites[key].position, mapsites[key].radius);
         sites[key] = mapsites[key].site;
+        sites[key].x = mapsites[key].position[0]
+        sites[key].y = mapsites[key].position[1]
     }
 }
 
@@ -285,6 +336,8 @@ make_notes = function(mapnotes) {
     for (var key in mapnotes) {
         make_note(key, key, mapnotes[key].position, mapnotes[key].radius);
         notes[key] = mapnotes[key].note;
+        notes[key].x = mapnotes[key].position[0];
+        notes[key].y = mapnotes[key].position[1];
     }
 }
 
@@ -397,7 +450,6 @@ add_link_to_links = function(link, id1, id2) {
     if (!(id2 in links)) {
         links[id2] = {};
     }
-    //can i push the object instead? how do i access it afterward...
     links[id1][link.attr("id")] = '1';
     links[id2][link.attr("id")] = '2';
 }
