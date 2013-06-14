@@ -44,18 +44,23 @@ def post_visualized_create_note_node(vid, note):
             site_node = _post_visualized_create_site_node(vis, note.site_id)
         note_node = _post_visualized_create_note_node(vis, note.id, site_node)
         root_id = vis.nodes.filter(Node.node_type==1).first().id
-        create_link(site_node.id, note_node.id, vid)
-        create_link(root_id, site_node.id, vid)
+        app.models.link.create_link(site_node.id, note_node.id, vid)
+        app.models.link.create_link(root_id, site_node.id, vid)
+
+def _get_radius(vis, node_type):
+    return min([n.radius for n in vis.nodes if n.node_type==node_type])
 
 def _post_visualized_create_note_node(vis, nid, site_node):
-    radius = min([n.radius for n in vis.nodes if n.node_type==NodeTypes.NOTE])
-    x = site_node.x + site_node.radius + 10
+    radius = _get_radius(vis, NodeTypes.NOTE)
+    #put it down at a location reasonably close to its site.
+    #rely on JS to fix overlaps
+    x = site_node.x + site_node.radius + radius + 55;
     y = site_node.y
-    return create_node(vid=vid, x=x, y=y, radius=radius,
-                       node_type=NodeTypes.NOTE, node_type_id=note.id)
+    return create_node(vid=vis.id, x=x, y=y, radius=radius,
+                       node_type=NodeTypes.NOTE, node_type_id=nid)
 
 def _post_visualized_create_site_node(vis, sid):
-    radius = min([n.radius for n in vis.nodes if n.node_type==NodeTypes.SITE])
+    radius = _get_radius(vis, NodeTypes.SITE)
     #put it down at a random location reasonably close to the top.
     #rely on JS to fix overlaps
     x = radius + (radius * random.randint(1, 20) / 2)
