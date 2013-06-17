@@ -31,6 +31,23 @@ class Visualization(app.db.Model):
                 ret['root'] = ser
         return ret
 
+    def update_node_state(self, notes, sites, root):
+        for dom_id, state in notes.iteritems():
+            self._update_node_state(dom_id, state)
+        for dom_id, state in sites.iteritems():
+            self._update_node_state(dom_id, state)
+        for dom_id, state in root.iteritems():
+            self._update_node_state(dom_id, state)
+        app.models.sql.commit()
+
+    def _update_node_state(self, dom_id, state):
+        node = app.models.node.node_with_dom_id_and_vid(dom_id, self.id)
+        if node:
+            node.x = int(state['x'])
+            node.y = int(state['y'])
+            return True
+        return False
+
     def __repr__(self):
         return '%d %s' % (self.id, self.last_save_time)
 
