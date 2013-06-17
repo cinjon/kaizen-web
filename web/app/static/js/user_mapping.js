@@ -149,27 +149,35 @@ turn_off_delete_tool = function() {
 save_state_tool_click = function() {
     console.log('save shit to the server');
     $("#save_state_tool").button('loading');
-    $.getJSON("{{ url_for('save_state') }}", {
-        sites: _save_nodes_json(sites, 'sites'),
-        notes: _save_nodes_json(notes, 'notes'),
-        root : _root_json()
-//         links: _link_json()
+    $.post($SCRIPT_ROOT + '/save_state', {
+        'vis_id' : JSON.stringify(mapdata.mapping.mid),
+        'sites'  : JSON.stringify(_save_nodes_json(sites, 'sites')),
+        'notes'  : JSON.stringify(_save_nodes_json(notes, 'notes')),
+        'root'   : JSON.stringify(_root_json())
     }, function(response) {
         //toggle button back
-        console.log('hey yo, responded');
         $("#save_state_tool").button();
-        console.log(response.result);
     });
+    return false;
 }
 
 _position_from_dom = function(dom) {
-    return {'x':dom.attr("link_x"), 'y':dom.attr("link_y")};
+    return {'x':parseInt(dom.attr("link_x")), 'y':parseInt(dom.attr("link_y"))};
+}
+
+_dom_has_moved = function(original_position, dom) {
+    var new_position = _position_from_dom(dom);
+    if (dom.attr("class").indexOf("noteNode") !== -1) {
+        new_position.x = new_position.x + parseInt(dom.attr("width")/2);
+        new_position.y = new_position.y + parseInt(dom.attr("height")/2);
+    }
+    if ((new_position.x != original_position[0] || new_position.y != original_position[1])) {
+        return [new_position.x, new_position.y];
+    }
+    return false;
 }
 
 _save_nodes_json = function(nodes, ty) {
-    console.log(mapdata[ty]);
-    console.log(ty);
-    console.log(nodes);
     var _id, node, ret;
     ret = {};
     for (_id in nodes) {
@@ -177,29 +185,27 @@ _save_nodes_json = function(nodes, ty) {
         if (node.deleted) {
             ret[_id] = 'deleted';
         } else {
-            var new_position, original_position;
-            new_position = _position_from_dom($('#' + _id));
-            original_position = mapdata[ty][_id].position;
-            console.log('id: ' + _id + ', original_position: ' + original_position + ', new_position: (' + new_position.x + ',' + new_position.y + ')');
-            if (new_position.x != original_position[0] || new_position.y != original_position[1]) {
-                ret[_id] = (new_position.x, new_position.y);
+            var _moved = _dom_has_moved(mapdata[ty][_id].position, $('#' + _id));
+            if (_moved) {
+                console.log('moved id: ' + _id);
+                ret[_id] = {'x':_moved[0], 'y':_moved[1]};
             }
         }
     }
     console.log(ret);
+    console.log('done with ' + ty);
     return ret;
 }
 
 _root_json = function() {
-    var _id, x, y, original_position;
+    var _id, _moved, ret
     _id = mapdata.root._id;
-    original_position = mapdata.root.position;
-    x, y = _position_from_dom($('#' + _id));
-    if (x !== original_position[0] || y !== original_position[1]) {
-        return (x, y);
-    } else {
-        return null;
+    _moved = _dom_has_moved(mapdata.root.position, $('#' + _id));
+    ret = {};
+    if (_moved) {
+        ret[_id] = {'x':_moved[0], 'y':_moved[1]};
     }
+    return ret;
 }
 
 display_root = function() {
@@ -290,8 +296,8 @@ make_root = function(maproot, name) {
     circle = svg.append("svg:circle")
         .attr("class", "rootNode")
         .attr("id", maproot._id)
-        .attr("cx", maproot.position[0])
-        .attr("cy", maproot.position[1])
+        .attr("cx", maproot.position[0]).attr("link_x", maproot.position[0])
+        .attr("cy", maproot.position[1]).attr("link_y", maproot.position[1])
         .attr("r", maproot.radius)
         .attr("fill", "wheat")
         .attr("stroke", "#dceaf4")

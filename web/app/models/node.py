@@ -68,4 +68,5 @@ def _post_visualized_create_site_node(vis, sid):
     return create_node(vid=vis.id, x=x, y=y, radius=radius,
                        node_type=NodeTypes.SITE, node_type_id=sid)
 
-
+def node_with_dom_id_and_vid(dom_id, vid):
+    return Node.query.filter(and_(Node.vid==vid, Node.dom_id==dom_id)).first()
