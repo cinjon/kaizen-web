@@ -26,6 +26,24 @@ class Node(app.db.Model):
     def serialize(self):
         return {'position':(self.x, self.y), 'radius':self.radius}
 
+    def delete(self):
+        if self.node_type == NodeTypes.SITE:
+            app.models.site.site_with_id(self.node_type_id).delete()
+        elif self.node_type == NodeTypes.NOTE:
+            app.models.note.note_with_id(self.node_type_id).delete()
+        else:
+            return
+        app.models.sql.delete(self)
+
+    def update_coordinates(self, state):
+        x = int(state['x'])
+        y = int(state['y'])
+        if self.node_type == NodeTypes.NOTE:
+            x = x - self.radius
+            y = y - self.radius
+        self.x = x
+        self.y = y
+
     def __repr__(self):
         return '(%d, %d) - %s' % (self.x, self.y, self.node_type)
 
@@ -36,7 +54,6 @@ def create_node(vid, x, y, radius, node_type, node_type_id):
 
 def post_visualized_create_note_node(vid, note):
     vis = app.models.visualization.Visualization.query.get(vid)
-    print vis
     if vis:
         site_node = Node.query.filter(and_(Node.node_type==NodeTypes.SITE,
                                            Node.node_type_id==note.site_id)).first()

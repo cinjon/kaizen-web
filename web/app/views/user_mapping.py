@@ -66,17 +66,15 @@ def reindex_note():
 @app.flask_app.route('/save_state', methods=['POST'])
 @login_required
 def save_state():
-    #All deleting goes through here. No one offs.
-    vis_id = request.form.get('vis_id')
-    notes = json.loads(request.form.get('notes'))
-    sites = json.loads(request.form.get('sites'))
-    root  = json.loads(request.form.get('root'))
-    v = app.models.visualization.visualization_with_id(int(vis_id))
+    v = app.models.visualization.visualization_with_id(int(request.form.get('vid')))
     if v:
-        v.update_node_state(notes, sites, root)
-        return jsonify(result='updating');
+        v.update_node_state(json.loads(request.form.get('notes')),
+                            json.loads(request.form.get('sites')),
+                            json.loads(request.form.get('root')),
+                            json.loads(request.form.get('links')))
+        return jsonify(result='success');
     else:
-        return jsonify(result='didnt find vis_id')
+        return jsonify(result='fail')
 
 @app.flask_app.route('/name_note')
 @login_required

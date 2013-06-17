@@ -42,6 +42,9 @@ class Note(app.db.Model):
             ret['mid'] = self.mapping_id
         return ret
 
+    def delete(self):
+        self.deleted = True
+
     def __unicode__(self):
         if len(self.text) > 50:
             return u"%s..." % self.text[:47]
@@ -53,3 +56,6 @@ def create_note(text, title, url, mapping_id, binding=-1):
     app.models.sql.add(note)
     app.models.node.post_visualized_create_note_node(mapping_id, note)
     return note
+
+def note_with_id(id):
+    return Note.query.get(id)
