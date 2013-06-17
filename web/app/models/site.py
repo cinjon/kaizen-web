@@ -27,7 +27,13 @@ class Site(app.db.Model):
                 'name'          : self.name,
                 'creation_time' : app.utility.serialize_datetime(self.creation_time)}
 
+    def delete(self):
+        self.deleted = True
+
 def create_site(url, title):
     site = Site(url, title)
     app.models.sql.add(site)
     return site
+
+def site_with_id(id):
+    return Site.query.get(id)

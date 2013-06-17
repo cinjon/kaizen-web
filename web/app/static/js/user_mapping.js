@@ -18,7 +18,7 @@
 // }
 
 var svg, width, height, radius;
-var links, notes, sites;
+var links, update_links, notes, sites;
 var mapdata;
 var connect_tool_state, delete_obj_tool_state;
 
@@ -54,6 +54,7 @@ set_initial_conditions = function(sandlot) {
     }
     set_objects = function() {
         links = {};
+        update_links = {'del':{}, 'add':{}};
         notes = {};
         sites = {};
     }
@@ -74,7 +75,7 @@ is_connected = function(node_s, node_e) {
     //Change later to differentiate between direction
     id_s = node_s.attr("id");
     id_e = node_e.attr("id");
-    if (id_s == id_e || id_s in links[id_e] || id_e in links[id_s]) {
+    if (id_s == id_e || (id_e in links && id_s in links[id_e]) || (id_s in links && id_e in links[id_s])) {
         return true;
     }
     return false;
@@ -114,14 +115,24 @@ add_connect_tool_click = function() {
     }
 }
 
+deactivate_button = function (_id, txt) {
+    var button = $("#" + _id);
+    if (button.attr("class").indexOf("active") !== -1) {
+        button.button('toggle');
+    }
+    if (txt) {
+        button.text(txt);
+    }
+}
+
 turn_off_connect_tool = function() {
     if (connect_tool_state) {
         connect_tool_state = false;
-        $("#add_connect_tool").text("Connect Off");
-        $("#add_connect_tool").button('toggle');
+        deactivate_button("add_connect_tool", "Connect Off");
     }
     var connect_tool_node = $('[class*="connect_node"]');
     if (connect_tool_node.length > 0) {
+        //TODO(css fix) --> This is not working as it should.
         var node_class = connect_tool_node.attr("class");
         connect_tool_node.attr("class", node_class.slice(0, -13));
         connect_tool_node.attr("fill", "wheat");
@@ -141,22 +152,19 @@ del_obj_tool_click = function() {
 turn_off_delete_tool = function() {
     if (delete_obj_tool_state) {
         delete_obj_tool_state = false;
-        $("#delete_obj_tool").text("Delete Off");
-        $("#delete_obj_tool").button('toggle');
+        deactivate_button("delete_obj_tool", "Delete Off");
     }
 }
 
 save_state_tool_click = function() {
-    console.log('save shit to the server');
-    $("#save_state_tool").button('loading');
     $.post($SCRIPT_ROOT + '/save_state', {
-        'vis_id' : JSON.stringify(mapdata.mapping.mid),
-        'sites'  : JSON.stringify(_save_nodes_json(sites, 'sites')),
-        'notes'  : JSON.stringify(_save_nodes_json(notes, 'notes')),
-        'root'   : JSON.stringify(_root_json())
+        'vid'   : JSON.stringify(mapdata.mapping.mid),
+        'sites' : JSON.stringify(_save_nodes_json(sites, 'sites')),
+        'notes' : JSON.stringify(_save_nodes_json(notes, 'notes')),
+        'root'  : JSON.stringify(_root_json()),
+        'links' : JSON.stringify(update_links)
     }, function(response) {
-        //toggle button back
-        $("#save_state_tool").button();
+        deactivate_button("save_state_tool");
     });
     return false;
 }
@@ -187,13 +195,10 @@ _save_nodes_json = function(nodes, ty) {
         } else {
             var _moved = _dom_has_moved(mapdata[ty][_id].position, $('#' + _id));
             if (_moved) {
-                console.log('moved id: ' + _id);
                 ret[_id] = {'x':_moved[0], 'y':_moved[1]};
             }
         }
     }
-    console.log(ret);
-    console.log('done with ' + ty);
     return ret;
 }
 
@@ -355,8 +360,8 @@ make_note = function(_id, name, position, radius) {
         .attr("id", _id)
         .attr("x", position[0] - side/2)
         .attr("y", position[1] - side/2)
-        .attr("link_x", position[0] - side/2)
-        .attr("link_y", position[1] - side/2)
+        .attr("link_x", position[0])
+        .attr("link_y", position[1])
         .attr("width", side)
         .attr("height", side)
         .attr("fill", "wheat") //rgb(6,120,155)
@@ -402,7 +407,19 @@ click = function(_default_click, _id) {
     return;
 }
 
+_get_connect_node_attr = function(node) {
+    var _id, link_x, link_y;
+    _id = node.attr("id");
+    link_x = parseInt(node.attr("link_x"));
+    link_y = parseInt(node.attr("link_y"));
+    return {'x':link_x, 'y':link_y, 'id':_id};
+}
+
 connect_node = function(_id) {
+    if (_id.indexOf('_') !== -1) {
+        return; //it's a link
+    }
+
     var node = $("#" + _id);
     var connect_tool_node = $('[class*="connect_node"]');
     if (connect_tool_node.length == 0) {
@@ -410,42 +427,87 @@ connect_node = function(_id) {
         node.attr("class", node_class + " connect_node");
         node.attr("fill", "#FF0000");
     } else if (!is_connected(node, connect_tool_node)) {
-        make_link(connect_tool_node.attr("link_x"), connect_tool_node.attr("link_y"),
-                  node.attr("link_x"), node.attr("link_y"),
-                  connect_tool_node.attr("id"), node.attr("id"));
+        start_node_attr = _get_connect_node_attr(connect_tool_node);
+        end_node_attr   = _get_connect_node_attr(node);
+        make_link(start_node_attr.x, start_node_attr.y,
+                  end_node_attr.x, end_node_attr.y,
+                  start_node_attr.id, end_node_attr.id);
+        _update_links('del', 'add', start_node_attr.id + '_' + end_node_attr.id);
         turn_off_connect_tool();
     }
 }
 
 delete_obj = function(_id) {
-    console.log('hey deleting this obj: ' + _id);
-    //
+    var obj = $("#" + _id);
+    if (obj.attr("class") == "link") {
+        _delete_link(obj, _id);
+    } else if (obj.attr("class") == "noteNode" || obj.attr("class") == "siteNode") {
+        _delete_node(obj, _id, obj.attr("class").slice(0,4));
+    }
 };
+
+_update_links = function(remove_from_ty, add_to_ty, _id) {
+    if (_id in update_links[remove_from_ty]) {
+        delete update_links[remove_from_ty][_id];
+    } else {
+        update_links[add_to_ty][_id] = true;
+    }
+}
+
+_delete_link = function(link, _id) {
+    var end_ids = _id.split('_');
+    delete links[end_ids[0]][_id];
+    delete links[end_ids[1]][_id];
+    _update_links('add', 'del', _id);
+    link.remove();
+}
+
+_delete_node = function(node, _id, ty) {
+    if (ty == "site") {
+        sites[_id].deleted = true;
+    } else if (ty == "note") {
+        notes[_id].deleted = true;
+    } else {
+        return;
+    }
+
+    for (var link_id in links[_id]) {
+        delete_obj(link_id);
+    }
+    $("#t" + _id).remove();
+    node.remove();
+}
 
 make_links = function(maplinks) {
     for (var index in maplinks) {
         var maplink = maplinks[index];
         var _id1 = maplink[0];
         var _id2 = maplink[3];
-        var link = make_link(maplink[1], maplink[2],
-                             maplink[4], maplink[5],
-                             _id1, _id2, maplink[6]);
-        add_link_to_links(link, _id1, _id2);
+        make_link(maplink[1], maplink[2],
+                  maplink[4], maplink[5],
+                  _id1, _id2, maplink[6]);
     }
 }
 
 make_link = function(e1x, e1y, e2x, e2y, e1id, e2id, weight) {
     //TODO utilize weight
+    //would be good to do something visually with the ends when you click the link
+    var _id = e1id + '_' + e2id;
+    var click_func = function() {return click(null, _id);};
     var link = svg.append("svg:line")
         .attr("x1", e1x)
         .attr("y1", e1y)
         .attr("x2", e2x)
         .attr("y2", e2y)
         .attr("class", "link")
-        .attr("id", e1id + '_' + e2id)
+        .attr("id", _id)
         .style("stroke", "#3E97D1")
         .style("stroke-width", 5)
         .style("stroke-opacity", .3)
+        .on("mouseover", function() {mouseover(d3.select(this), "#A60000");})
+        .on("mouseout", function() {mouseout(d3.select(this), "#3E97D1");})
+        .on("click", click_func);
+    add_link_to_links(link, e1id, e2id);
     return link;
 }
 

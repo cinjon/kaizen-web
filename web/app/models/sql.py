@@ -5,5 +5,9 @@ def add(transaction):
     db.session.add(transaction)
     commit()
 
+def delete(transaction):
+    db.session.delete(transaction)
+    commit()
+
 def commit():
     db.session.commit()

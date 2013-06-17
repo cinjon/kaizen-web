@@ -31,7 +31,12 @@ class Visualization(app.db.Model):
                 ret['root'] = ser
         return ret
 
-    def update_node_state(self, notes, sites, root):
+    def update_node_state(self, notes, sites, root, links):
+        print links
+        for link_dom_id in links['del']:
+            self._delete_link(link_dom_id)
+        for link_dom_id in links['add']:
+            self._add_link(link_dom_id)
         for dom_id, state in notes.iteritems():
             self._update_node_state(dom_id, state)
         for dom_id, state in sites.iteritems():
@@ -43,10 +48,25 @@ class Visualization(app.db.Model):
     def _update_node_state(self, dom_id, state):
         node = app.models.node.node_with_dom_id_and_vid(dom_id, self.id)
         if node:
-            node.x = int(state['x'])
-            node.y = int(state['y'])
-            return True
-        return False
+            if state == 'deleted':
+                node.delete()
+            else:
+                node.update_coordinates(state)
+
+    def _delete_link(self, link_dom_id):
+        node_dom_ids = link_dom_id.split('_')
+        start_node = app.models.node.node_with_dom_id_and_vid(node_dom_ids[0], self.id)
+        end_node = app.models.node.node_with_dom_id_and_vid(node_dom_ids[1], self.id)
+        link = app.models.link.link_with_nids(start_node.id, end_node.id)
+        if link:
+            link.delete()
+
+    def _add_link(self, link_dom_id):
+        node_dom_ids = link_dom_id.split('_')
+        app.models.link.create_link(
+            app.models.node.node_with_dom_id_and_vid(node_dom_ids[0], self.id).id,
+            app.models.node.node_with_dom_id_and_vid(node_dom_ids[1], self.id).id,
+            self.id)
 
     def __repr__(self):
         return '%d %s' % (self.id, self.last_save_time)

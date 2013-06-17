@@ -1,4 +1,5 @@
 import app
+from sqlalchemy import and_
 
 class Link(app.db.Model):
     id = app.db.Column(app.db.Integer, primary_key=True)
@@ -17,9 +18,13 @@ class Link(app.db.Model):
         return (start_node.dom_id, start_node.x, start_node.y,
                 end_node.dom_id, end_node.x, end_node.y)
 
+    def delete(self):
+        app.models.sql.delete(self)
+
 def create_link(start_nid, end_nid, vid):
     link = Link(start_nid, end_nid, vid)
     app.models.sql.add(link)
     return link
 
-
+def link_with_nids(start_nid, end_nid):
+    return Link.query.filter(and_(Link.start_nid==start_nid, Link.end_nid==end_nid)).first()
