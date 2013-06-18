@@ -32,7 +32,7 @@ def user_index():
     for u in kaizen_user.all_users_sorted_by_note_total():
         if u.email == g.user.email:
             continue
-        users.append({'first':u.first, 'last':u.last,
+        users.append({'name':u.name,
                       'map_total':len(u.mappings.all()),
                       'note_total':u.number_of_notes()})
     mappings = []

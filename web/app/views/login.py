@@ -6,7 +6,6 @@ from flask.ext.login import current_user, login_required, logout_user
 def load_user(id):
     return app.models.kaizen_user.user_with_id(id)
 
-
 @app.flask_app.before_request
 def before_request():
     if current_user.is_anonymous():
@@ -14,12 +13,10 @@ def before_request():
     else:
         g.user = current_user
 
-
 def handle_g_user():
     if request.is_xhr:
         return app.utility.xhr_user_login(g.user, True)
     return app.views.index.go_to_index()
-
 
 #only for the extension
 @app.flask_app.route('/ext-login', methods=['GET', 'POST'])
