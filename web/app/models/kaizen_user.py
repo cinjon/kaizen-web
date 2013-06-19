@@ -1,7 +1,7 @@
 import app
 from flask import session, flash
 from flask.ext.login import login_user
-from sqlalchemy import and_
+from flask.ext.security.utils import verify_and_update_password
 from flask.ext.security import UserMixin
 from app.models.role import roles_users
 
@@ -16,7 +16,7 @@ class KaizenUser(app.db.Model, UserMixin):
     id = app.db.Column(app.db.Integer, primary_key=True)
     name = app.db.Column(app.db.String(120), unique=True)
     email = app.db.Column(app.db.String(120), unique=True, index=True) #Required
-    password = app.db.Column(app.db.String(100)) #Required
+    password = app.db.Column(app.db.String(120)) #Required
     active = app.db.Column(app.db.Boolean())
     creation_time = app.db.Column(app.db.DateTime)
     last_login_at = app.db.Column(app.db.DateTime())
@@ -33,7 +33,7 @@ class KaizenUser(app.db.Model, UserMixin):
         self.email = email
         self.name = name
         self.active = active
-        self.password = self.set_password(password)
+        self.password = password
         self.creation_time = app.utility.get_time()
 #         self.roles = roles
 
@@ -51,11 +51,8 @@ class KaizenUser(app.db.Model, UserMixin):
     def get_id(self):
         return unicode(self.id)
 
-    def set_password(self, password):
-        return app.utility.generate_hash(password)
-
     def check_password(self, password):
-        return app.utility.check_hash(self.password, password)
+        return verify_and_update_password(password, self)
 
     def get_current_mappings(self):
         return self.mappings.filter(app.models.mapping.Mapping.binding > -1).order_by(app.models.mapping.Mapping.binding)
