@@ -105,11 +105,6 @@ class KaizenUser(app.db.Model, UserMixin):
     def __repr__(self):
         return self.name
 
-def create_user(name, email, password, role=ROLE_USER, active=True):
-    user = KaizenUser(name=name, email=email, password=password, active=active)
-    app.models.sql.add(user)
-    return user
-
 def user_with_id(id):
     return KaizenUser.query.get(int(id))
 
