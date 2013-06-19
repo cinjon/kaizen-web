@@ -4,14 +4,23 @@ SECRET_KEY = 'falafel'
 basedir = os.path.abspath(os.path.dirname(__file__))
 SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', os.environ.get('KAIZEN_DATABASE_URL', None))
 
-MAIL_SERVER = 'smtp.gmail.com'
-MAIL_PORT = 465
-MAIL_USE_TLS = False
-MAIL_USE_SSL = True
-MAIL_USERNAME = 'chimu.kaizen@gmail.com'
-MAIL_PASSWORD = 'abkaizen'
-MAIL_DEFAULT_SENDER = 'chimu.kaizen@gmail.com'
-MAIL_SUPPRESS_SEND = False
+MAIL_SERVER = os.environ.get('KAIZEN_MAIL_SERVER')
+MAIL_PORT = os.environ.get('KAIZEN_MAIL_PORT')
+MAIL_USE_TLS = os.environ.get('KAIZEN_MAIL_USE_TLS')
+MAIL_USE_SSL = os.environ.get('KAIZEN_MAIL_USE_SSL')
+MAIL_USERNAME = os.environ.get('KAIZEN_MAIL_USERNAME')
+MAIL_PASSWORD = os.environ.get('KAIZEN_MAIL_PASSWORD')
+MAIL_DEFAULT_SENDER = os.environ.get('KAIZEN_MAIL_DEFAULT_SENDER')
+MAIL_SUPPRESS_SEND = os.environ.get('KAIZEN_MAIL_SUPPRESS_SEND')
+
+print 'MServer: %s' % MAIL_SERVER
+print 'MPort: %s' % MAIL_PORT
+print 'MTLS: %s' % MAIL_USE_TLS
+print 'MSSL: %s' % MAIL_USE_SSL
+print 'MUser: %s' % MAIL_USERNAME
+print 'MPass: %s' % MAIL_PASSWORD
+print 'MDefaultSender: %s' % MAIL_DEFAULT_SENDER
+print 'MSuppressSend: %s' % MAIL_SUPPRESS_SEND
 
 # Flask-Security Flags
 SECURITY_CONFIRMABLE = True

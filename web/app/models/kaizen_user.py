@@ -29,13 +29,13 @@ class KaizenUser(app.db.Model, UserMixin):
                             backref=app.db.backref('users', lazy='dynamic'))
     mappings = app.db.relationship('Mapping', backref='user', lazy='dynamic')
 
-    def __init__(self, name, email, password, active):
+    def __init__(self, name, email, password, roles, active):
         self.email = email
         self.name = name
         self.active = active
         self.password = password
         self.creation_time = app.utility.get_time()
-#         self.roles = roles
+        self.roles = roles
 
     def is_authenticated(self):
         #Can the user be logged in in general?

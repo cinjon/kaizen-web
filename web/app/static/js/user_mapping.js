@@ -317,6 +317,7 @@ make_sites = function(mapsites) {
     for (var key in mapsites) {
         //replace name (second key) with some name
         make_site(key, key, mapsites[key].position, mapsites[key].radius);
+        console.log('mapsites with key ' + key + ', ' + mapsites[key] + ', ' + mapsites[key].site);
         sites[key] = mapsites[key].site;
         sites[key].x = mapsites[key].position[0]
         sites[key].y = mapsites[key].position[1]
