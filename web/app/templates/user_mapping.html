@@ -2,60 +2,58 @@
 
 {% block content %}
 <div style="padding-left:110px">
-
-<div class="row-fluid">
-  <div class="tabbable">
-    <div class="span3">
-      <div class="row-fluid smallbox">
-        <p class="mapname" style="text-align:center">{{ mapping.name }}</p>
+  <div class="row-fluid">
+    <div class="tabbable">
+      <div class="span3">
+        <div class="row-fluid smallbox">
+          <p class="mapname" style="text-align:center">{{ mapping.name }}</p>
+        </div>
+        <div class="row-fluid">
+          <div class="box">
+            <ul class="nav nav-pills nav-stacked">
+              {% for site in sites %}
+              {% if loop.first %}
+              <li class="active">
+                {% else %}
+              <li>
+                {% endif %}
+                <a href="#site{{loop.index}}" data-toggle="tab">{{site.name}}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
       </div>
-      <div class="row-fluid">
-      <div class="box">
-      <ul class="nav nav-pills nav-stacked">
-        {% for site in sites %}
-        {% if loop.first %}
-        <li class="active">
-        {% else %}
-        <li>
-        {% endif %}
-          <a href="#site{{loop.index}}" data-toggle="tab">{{site.name}}</a>
-        </li>
-        {% endfor %}
-      </ul>
-      </div>
-      </div>
-    </div>
-    <div class="span8">
+      <div class="span8">
         <div class="tab-content">
           {% for site in sites %}
-            {% if loop.first %}
-            <div id="site{{loop.index}}" class="tab-pane active">
+          {% if loop.first %}
+          <div id="site{{loop.index}}" class="tab-pane active">
             {% else %}
             <div id="site{{loop.index}}" class="tab-pane">
-            {% endif %}
-            <div class="smallbox">
-              <div class="row-fluid">
-                <div class="span8 offset1"><p class="mapname">{{site.title}}</p></div>
-                <div class="pull-right" style="margin-right:15px">{{site.notes|length}} Notes</div>
+              {% endif %}
+              <div class="smallbox">
+                <div class="row-fluid">
+                  <div class="span8 offset1">
+                    <p class="mapname">{{site.title}}</p>
+                  </div>
+                  <div class="pull-right" style="margin-right:15px">{{site.notes|length}} Notes
+                  </div>
+                </div>
               </div>
-            </div>
-            {% for note in site.notes %}
-            <div class="box">
-            {% set loop_index=loop.index %}
-            {% set mapping=mapping %}
-            {% include 'small_note_banner_plus.html' %}
+              {% for note in site.notes %}
+              <div class="box">
+                {% set loop_index=loop.index %}
+                {% set mapping=mapping %}
+                {% include 'small_note_banner_plus.html' %}
+              </div>
+              {% endfor %}
             </div>
             {% endfor %}
           </div>
-          {% endfor %}
-            </div>
         </div>
+      </div>
     </div>
   </div>
 </div>
-</div>
-{% endblock %}
-
-{% block footer %}
-<script src="/static/js/user_mapping_alex.js"></script>
 {% endblock %}
