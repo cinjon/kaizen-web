@@ -9,12 +9,10 @@ ROLE_USER = 0
 ROLE_ADMIN = 1
 ROLE_TEST = 2
 
-STATUS_AWAITING_CONFIRMATION = 'awaiting_confirm'
-STATUS_ACTIVE = 'active'
-
 class KaizenUser(app.db.Model, UserMixin):
     id = app.db.Column(app.db.Integer, primary_key=True)
-    name = app.db.Column(app.db.String(120), unique=True)
+    name = app.db.Column(app.db.String(120))
+    name_route = app.db.Column(app.db.String(140))
     email = app.db.Column(app.db.String(120), unique=True, index=True) #Required
     password = app.db.Column(app.db.String(120)) #Required
     active = app.db.Column(app.db.Boolean())
@@ -36,6 +34,7 @@ class KaizenUser(app.db.Model, UserMixin):
         self.password = password
         self.creation_time = app.utility.get_time()
         self.roles = roles
+        self.name_route = self.set_name_route(name)
 
     def is_authenticated(self):
         #Can the user be logged in in general?
@@ -50,6 +49,13 @@ class KaizenUser(app.db.Model, UserMixin):
 
     def get_id(self):
         return unicode(self.id)
+
+    def set_name_route(self, name):
+        count = KaizenUser.query.filter(KaizenUser.name==name).count()
+        name = dashify_name(name)
+        if count > 0:
+            name = name + '-' + str(count)
+        return name
 
     def check_password(self, password):
         return verify_and_update_password(password, self)
@@ -120,8 +126,8 @@ class KaizenUser(app.db.Model, UserMixin):
 def user_with_id(id):
     return KaizenUser.query.get(int(id))
 
-def user_with_name(name):
-    filtered = KaizenUser.query.filter_by(name=name).all()
+def user_with_name_route(name_route):
+    filtered = KaizenUser.query.filter_by(name_route=name_route).all()
     if len(filtered) == 1:
         return filtered[0]
     return None
@@ -156,3 +162,8 @@ def try_register(email, password, name, xhr=False):
 def all_users_sorted_by_note_total():
     users = KaizenUser.query.all()
     return sorted(users, key=lambda x: x.number_of_notes())
+
+def dashify_name(name):
+    parts = [p for p in name.strip().split(' ') if not(p=='')]
+    ret = '-'.join(parts).replace('.', '-')
+    return ret
