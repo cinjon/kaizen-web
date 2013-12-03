@@ -22,7 +22,7 @@
           <a class="brand" href="{{ url_for('index') }}" style="margin-left:2px; font-size:small">towards continuous improvement</a>
           {% if g.user %}
           <ul class="nav pull-right">
-            <li><a href="{{ url_for('user_profile_owner') }}">{{g.user.name}}</a></li>
+            <li><a href="/me">{{g.user.name}}</a></li>
             <li><a href="{{ url_for_security('logout') }}">Logout</a></li>
           </ul>
           {% endif %}
