@@ -12,17 +12,17 @@ def owner_profile():
     allmaps['notes'] = view_notes(g.user, 5)
     return render_template('user_profile.html', user=g.user, mappings=mappings, allmaps=allmaps)
 
-@flask_app.route('/user/<name>')
+@flask_app.route('/user/<name_route>')
 @login_required
 def user_profile(name):
-    if g.user and g.user.name == name:
+    if g.user and g.user.name_route == name_route:
         return redirect(url_for('user_profile_owner'))
 
-    viewed = kaizen_user.user_with_name(name)
+    viewed = kaizen_user.user_with_name_route(name_route)
     if viewed:
         return render_template('user_profile.html', user=viewed, mappings=view_mappings(viewed), notes=view_notes(viewed, 5))
     flash('No user with name %s, should have 404ed' % name)
-    #TODO return no user with name 404 page
+    return redirect(url_for('404'))
 
 def view_mappings(u):
     return [{'name':str(m.name), 'notes':m.get_all_notes(), 'sites':m.get_all_sites()} for m in u.get_all_mappings_in_notes_order()]
