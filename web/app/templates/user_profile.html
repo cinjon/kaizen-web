@@ -1,51 +1,76 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-.box {
-    padding: 25px 15px 5px 35px;
-}
-</style>
-<div class="row">
-    <div class="span12">
-        <h2>{{user.name}}'s maps</h2>
-    </div>
+<div style="padding-left:110px">
+<div class="row-fluid">
+  <div class="span3">
+    <input id="mapTypeAhead" type="text" class="span3" style="margin: 0 auto; width:100%" data-provide="typeahead" data-items="4"
+           data-source='[{% for mapping in mappings %}&quot;{{mapping.name}}&quot;,{% endfor %}&quot;--&quot;]'
+           autocomplete="off" placeholder="Search your maps">
+  </div>
 </div>
-<div class="box">
-    <div class="row">
-        <div class="span11">
-            <input id="mapTypeAhead" type="text" class="span11" style="margin: 0 auto;" data-provide="typeahead" data-items="4"
-                   data-source='[{% for mapping in mappings %}&quot;{{mapping.name}}&quot;,{% endfor %}&quot;--&quot;]'
-                   autocomplete="off" placeholder="Search your maps">
-        <hr/>
+<br>
+
+<div class="row-fluid">
+  <div class="tabbable">
+    <div class="span3">
+      <div class="box">
+      <ul class="nav nav-pills nav-stacked">
+        <li class="active"><a href="#allmaps" data-toggle="tab">All</a></li>
+        {% for mapping in mappings %}
+        <li><a href="#mapping{{loop.index}}" data-toggle="tab">{{mapping.name}}</a></li>
+        {% endfor %}
+      </ul>
+      </div>
+    </div>
+    <div class="span8">
+        <div class="tab-content">
+          <div id="allmaps" class="tab-pane active">
+            <div class="smallbox">
+              <div class="row-fluid">
+                <div class="span2 offset1"><p class="mapname">All</p></div>
+                <div class="span2 offset1">{{allmaps.sumSites}} Sites</div>
+                <div class="span2">{{allmaps.sumNotes}} Notes</div>
+              </div>
+            </div>
+            {% for note in allmaps.notes %}
+            <div class="box">
+            {% set loop_index=loop.index %}
+            {% set mapping=note.my_mapping() %}
+            {% include 'small_note_banner.html' %}
+            </div>
+            {% endfor %}
+          </div>
+          {% for mapping in mappings %}
+          <div id="mapping{{loop.index}}" class="tab-pane">
+            <div class="smallbox">
+              <div class="row-fluid">
+                <div class="span2 offset1"><p class="mapname">{{mapping.name}}</p></div>
+                <div class="span2 offset1">{{mapping.sites|length}} Sites</div>
+                <div class="span2">{{mapping.notes|length}} Notes</div>
+                {% if mapping.sites|length > 0 %}
+                <div class="pull-right" style="margin-right:15px"><a href="{{url_for('user_mapping', uname=user.name, mname=mapping.name)}}">Go to Map</a></div>
+                {% endif %}
+              </div>
+            </div>
+            {% if mapping.notes|length > 0 %}
+              {% for note in mapping.notes %}
+              <div class="box">
+              {% set loop_index=loop.index %}
+              {% include 'small_note_banner.html' %}
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="box">
+                <p>More notes please.</p>
+              </div>
+            {% endif %}
+          </div>
+          {% endfor %}
         </div>
     </div>
-    <div class="row">
-        <div class="span11">
-            <table data-provides="rowlink" class="table table-hover table-condensed">
-                <thead>
-                    <tr>
-                        <td>Map Name</td>
-                        <td>Binding</td>
-                        <td>Last Update</td>
-                        <td>Notes</td>
-                    </tr>
-                </thead>
-                <tbody>
-                  {% for mapping in mappings %}
-                  <tr>
-                    <td><p><a href="{{ url_for('user_mapping', uname=user.name, mname=mapping.name) }}">{{mapping.name}}</a></p></td>
-                    <td><p>{{mapping.binding}}</p></td>
-                    <td>
-                      {% if mapping.notes %} <p>{{mapping.notes[0].creation_time.strftime('%Y-%m-%d')}}</p> {% else %} - {% endif %}
-                    </td>
-                    <td><p>{{mapping.notes|length}}</p></td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+  </div>
+</div>
 </div>
 <script type="text/javascript">
 

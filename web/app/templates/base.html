@@ -7,44 +7,35 @@
     <script src="/static/js/jquery-latest.js"></script>
     <link href="/static/css/bootstrap-rowlink.min.css" rel="stylesheet">
     <link href="/static/css/kaizen.css" rel="stylesheet">
-    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
     <script src="/static/js/bootstrap-rowlink.js"></script>
     <script src="/static/js/bootstrap-typeahead.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% if title %}
-    <title>{{title}}</title>
-    {% else %}
     <title>Kaizen</title>
-    {% endif %}
     {% endblock %}
   </head>
   <body>
-    <div class="container">
+    <div class="container-fluid" id="content">
       <div class="navbar">
         <div class="navbar-inner" style="background-color:#dceaf4">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
           <a class="brand" href="{{ url_for('index') }}">Kaizen</a>
+          <a class="brand" href="{{ url_for('index') }}" style="margin-left:2px; font-size:small">towards continuous improvement</a>
           {% if g.user %}
-          <ul class="nav">
-            <li><a href="{{ url_for('user_profile_owner', name=g.user.name) }}">{{g.user.name}}</a></li>
+          <ul class="nav pull-right">
+            <li><a href="{{ url_for('user_profile_owner') }}">{{g.user.name}}</a></li>
             <li><a href="{{ url_for_security('logout') }}">Logout</a></li>
           </ul>
           {% endif %}
         </div>
       </div>
-      <div class="row">
+      <div class="row-fluid">
         <div class="span12">
           {% block content %}{% endblock %}
         </div>
       </div>
     </div>
   </body>
-  <footer>
-    <hr>
+  <footer style="background-color:#93E6F0">
     <script type=text/javascript>
       $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
