@@ -3,17 +3,17 @@
 {% block content %}
 <div style="padding-left:110px">
 <div class="row-fluid">
-  <div class="span3">
-    <input id="mapTypeAhead" type="text" class="span3" style="margin: 0 auto; width:100%" data-provide="typeahead" data-items="4"
-           data-source='[{% for mapping in mappings %}&quot;{{mapping.name}}&quot;,{% endfor %}&quot;--&quot;]'
-           autocomplete="off" placeholder="Search your maps">
-  </div>
 </div>
 <br>
 
 <div class="row-fluid">
   <div class="tabbable">
     <div class="span3">
+      <div class="smallbox" style="padding-top:0px; height:39px">
+      <input id="mapTypeAhead" type="text" class="span3" style="margin:0 auto; height:inherit; width:100%; text-align:center" data-provide="typeahead" data-items="4"
+               data-source='[{% for mapping in mappings %}&quot;{{mapping.name}}&quot;,{% endfor %}&quot;--&quot;]'
+               autocomplete="off" placeholder="Search your maps">
+      </div>
       <div class="box">
       <ul class="nav nav-pills nav-stacked">
         <li class="active"><a href="#allmaps" data-toggle="tab">All</a></li>
