@@ -1,3 +1,10 @@
+body {
+    background-color:#93E6F0;
+    min-height:600px;
+    height: auto !important;
+    height:600px;
+}
+
 hr.style-one {
     border: 0;
     height: 1px;
@@ -60,4 +67,37 @@ h2,h3 {
 	-ms-transform: skew(5deg) rotate(5deg);
 	-o-transform: skew(5deg) rotate(5deg);
 	transform: skew(5deg) rotate(5deg);
+}
+div.well {
+        background-color:#ffffff;
+}
+div.center {
+        margin-left:auto;
+        margin-right:auto;
+        width:20%;
+        background-color:#dceaf4;
+        text-align:center;
+        font-size:15px;
+        border: 1px solid;
+}
+div.left {
+        background-color:#dceaf4;
+        width:126px;
+        border: 1px solid;
+        font-size:15px;
+        text-align:center;
+}
+p.mapname {
+        font-size:18px;
+        margin-left:25px
+}
+.smallbox {
+          position: relative;
+          padding: 9px 0px 0px 0px;
+          margin: 0 auto;
+          margin-bottom: 8px;
+	background-color: #fff;
+	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 0 3px rgba(0, 0, 0, 0.2), inset 0 0 1px rgba(0, 0, 0, 0.1);
 }
