@@ -6,7 +6,7 @@ from flask.ext.login import login_required
 
 @flask_app.route('/me', endpoint='me')
 @login_required
-def wtf():
+def owner_profile():
     mappings = view_mappings(g.user)
     allmaps = summarize_maps(mappings)
     allmaps['notes'] = view_notes(g.user, 5)
