@@ -16,9 +16,15 @@ MAIL_SUPPRESS_SEND = os.environ.get('KAIZEN_MAIL_SUPPRESS_SEND')
 # Flask-Security Flags
 SECURITY_CONFIRMABLE = False
 SECURITY_REGISTERABLE = True
+SECURITY_POST_REGISTER_VIEW = 'me'
+SECURITY_POST_LOGIN_VIEW = 'me'
 SECURITY_RECOVERABLE = True
 SECURITY_TRACKABLE = True
 SECURITY_PASSWORD_HASH = 'sha512_crypt'
 SECURITY_PASSWORD_SALT = '!#*PFK%WOq3j3kf'
+SECURITY_MSG_USER_DOES_NOT_EXIST = ('That email is not these parts', 'error')
+SECURITY_MSG_INVALID_PASSWORD = ('That password was not right', 'error')
+SECURITY_MSG_PASSWORD_NOT_PROVIDED = ('Password por favor', 'error')
+SECURITY_MSG_EMAIL_NOT_PROVIDED = ('Email por favor', 'error')
 
 ADMINS = ['chimu.kaizen@gmail.com']
