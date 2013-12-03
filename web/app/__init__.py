@@ -13,7 +13,7 @@ db = SQLAlchemy(flask_app)
 
 lm = LoginManager()
 lm.setup_app(flask_app)
-lm.login_view = 'login'
+lm.login_view = 'index'
 
 mail = Mail(flask_app)
 
@@ -27,6 +27,7 @@ def before_first_request():
 import models
 security_ds = SQLAlchemyUserDatastore(db, models.kaizen_user.KaizenUser, models.role.Role)
 security = Security(flask_app, security_ds, register_form=ExtendedRegisterForm, confirm_register_form=ExtendedRegisterForm)
+
 flask_app.security = security
 
 import views

@@ -13,17 +13,8 @@ MAIL_PASSWORD = os.environ.get('KAIZEN_MAIL_PASSWORD')
 MAIL_DEFAULT_SENDER = os.environ.get('KAIZEN_MAIL_DEFAULT_SENDER')
 MAIL_SUPPRESS_SEND = os.environ.get('KAIZEN_MAIL_SUPPRESS_SEND')
 
-print 'MServer: %s' % MAIL_SERVER
-print 'MPort: %s' % MAIL_PORT
-print 'MTLS: %s' % MAIL_USE_TLS
-print 'MSSL: %s' % MAIL_USE_SSL
-print 'MUser: %s' % MAIL_USERNAME
-print 'MPass: %s' % MAIL_PASSWORD
-print 'MDefaultSender: %s' % MAIL_DEFAULT_SENDER
-print 'MSuppressSend: %s' % MAIL_SUPPRESS_SEND
-
 # Flask-Security Flags
-SECURITY_CONFIRMABLE = True
+SECURITY_CONFIRMABLE = False
 SECURITY_REGISTERABLE = True
 SECURITY_RECOVERABLE = True
 SECURITY_TRACKABLE = True
