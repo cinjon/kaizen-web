@@ -32,8 +32,12 @@ class Mapping(app.db.Model):
         return [n for n in self.notes]
 
     def get_all_sites(self):
-        sites = set([n.site for n in self.notes])
-        return list(sites)
+        return list(set([n.site for n in self.notes]))
+
+    def has_notes(self):
+        for n in self.notes:
+            return True
+        return False
 
     def serialize(self, include_notes=False, include_user=False):
         ret = {'mid'   : self.id,

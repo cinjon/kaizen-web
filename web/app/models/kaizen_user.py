@@ -66,6 +66,9 @@ class KaizenUser(app.db.Model, UserMixin):
         [ret.append(m) for m in self.mappings.filter(app.models.mapping.Mapping.binding < 0).order_by(app.models.mapping.Mapping.name)]
         return ret
 
+    def get_all_mappings_in_notes_order(self):
+        return sorted(self.mappings, key=lambda m: len(m.get_all_notes()), reverse=True)
+
     def set_binding(self, binding, to_mapping):
         to_mapping = app.utility.decodeJS(to_mapping)
         found_mapping = None
@@ -101,6 +104,15 @@ class KaizenUser(app.db.Model, UserMixin):
 
     def number_of_notes(self):
         return sum([len(m.notes.all()) for m in self.mappings])
+
+    def recent_notes(self, limit=10):
+        notes = []
+        for m in self.mappings:
+            for n in m.notes.filter(
+                not(app.models.note.Note.text == '')).order_by(
+                app.models.note.Note.creation_time.desc()).limit(limit):
+                notes.append(n)
+        return sorted(notes, key=lambda n: n.creation_time, reverse=True)[:limit]
 
     def __repr__(self):
         return self.name

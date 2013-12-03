@@ -65,7 +65,10 @@ def post_visualized_create_note_node(vid, note):
         app.models.link.create_link(root_id, site_node.id, vid)
 
 def _get_radius(vis, node_type):
-    return min([n.radius for n in vis.nodes if n.node_type==node_type])
+    lst = [n.radius for n in vis.nodes if n.node_type==node_type]
+    if len(lst) > 0:
+        return min(lst)
+    return 1
 
 def _post_visualized_create_note_node(vis, nid, site_node):
     radius = _get_radius(vis, NodeTypes.NOTE)

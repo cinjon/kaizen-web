@@ -42,6 +42,15 @@ class Note(app.db.Model):
             ret['mid'] = self.mapping_id
         return ret
 
+    def my_mapping(self):
+        return app.models.mapping.Mapping.query.get(self.mapping_id)
+
+    def short_title(self):
+        title = self.site.title
+        if len(title) > 60:
+            return title[:57] + '...'
+        return title
+
     def delete(self):
         self.deleted = True
 

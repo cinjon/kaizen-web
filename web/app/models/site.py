@@ -20,6 +20,14 @@ class Site(app.db.Model):
     def update_title(self, title):
         self.title = title
 
+    def short_title(self):
+        if len(self.title) > 60:
+            return self.title[:57] + '...'
+        return self.title
+
+    def notes_in_chrono_order(self):
+        return [n for n in self.notes.order_by(app.models.note.Note.creation_time.desc())]
+
     def serialize(self):
         return {'sid'           : self.id,
                 'url'           : self.url,
