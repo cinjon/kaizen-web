@@ -4,9 +4,9 @@ from flask import g, render_template, redirect, flash, url_for
 from flask.ext.login import login_required
 
 
-@flask_app.route('/me')
+@flask_app.route('/me', endpoint='me')
 @login_required
-def user_profile_owner():
+def wtf():
     mappings = view_mappings(g.user)
     allmaps = summarize_maps(mappings)
     allmaps['notes'] = view_notes(g.user, 5)

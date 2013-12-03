@@ -2,28 +2,27 @@
 
 {% block content %}
 <div style="padding-left:110px">
-<div class="row-fluid">
-</div>
-<br>
-
-<div class="row-fluid">
-  <div class="tabbable">
-    <div class="span3">
-      <div class="smallbox" style="padding-top:0px; height:39px">
-      <input id="mapTypeAhead" type="text" class="span3" style="margin:0 auto; height:inherit; width:100%; text-align:center" data-provide="typeahead" data-items="4"
-               data-source='[{% for mapping in mappings %}&quot;{{mapping.name}}&quot;,{% endfor %}&quot;--&quot;]'
-               autocomplete="off" placeholder="Search your maps">
+  <div class="row-fluid">
+    <div class="tabbable">
+      <div class="span3">
+        <div class="setbox_39">
+          <input id="mapTypeAhead" type="text" class="span3" style="margin:0 auto; height:inherit; width:100%; text-align:center" data-provide="typeahead" data-items="4"
+                 data-source='[{% for mapping in mappings %}&quot;{{mapping.name}}&quot;,{% endfor %}&quot;--&quot;]'
+                 autocomplete="off" placeholder="Search your maps">
+        </div>
+        {% if allmaps.notes %}
+        <div class="box">
+          <ul class="nav nav-pills nav-stacked">
+            <li class="active"><a href="#allmaps" data-toggle="tab">All</a></li>
+            {% for mapping in mappings %}
+            <li><a href="#mapping{{loop.index}}" data-toggle="tab">{{mapping.name}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
       </div>
-      <div class="box">
-      <ul class="nav nav-pills nav-stacked">
-        <li class="active"><a href="#allmaps" data-toggle="tab">All</a></li>
-        {% for mapping in mappings %}
-        <li><a href="#mapping{{loop.index}}" data-toggle="tab">{{mapping.name}}</a></li>
-        {% endfor %}
-      </ul>
-      </div>
-    </div>
-    <div class="span8">
+      <div class="span8">
+        {% if allmaps.notes %}
         <div class="tab-content">
           <div id="allmaps" class="tab-pane active">
             <div class="smallbox">
@@ -35,9 +34,9 @@
             </div>
             {% for note in allmaps.notes %}
             <div class="box">
-            {% set loop_index=loop.index %}
-            {% set mapping=note.my_mapping() %}
-            {% include 'small_note_banner.html' %}
+              {% set loop_index=loop.index %}
+              {% set mapping=note.my_mapping() %}
+              {% include 'small_note_banner.html' %}
             </div>
             {% endfor %}
           </div>
@@ -54,23 +53,33 @@
               </div>
             </div>
             {% if mapping.notes|length > 0 %}
-              {% for note in mapping.notes %}
-              <div class="box">
+            {% for note in mapping.notes %}
+            <div class="box">
               {% set loop_index=loop.index %}
               {% include 'small_note_banner.html' %}
-              </div>
-              {% endfor %}
+            </div>
+            {% endfor %}
             {% else %}
-              <div class="box">
-                <p>More notes please.</p>
-              </div>
+            <div class="box">
+              <p>More notes please.</p>
+            </div>
             {% endif %}
           </div>
           {% endfor %}
         </div>
+      </div>
+      {% else %}
+      <div class="setbox_39">
+        <div class="box">
+          <p>Hi there {{user.name}}. It looks like you don't have any maps.</p>
+          <p>If you already have the extension, click on the little icon in the top right of your browser.</p>
+          <p>If you don't have it, click the big blue button below to get it. Enjoy.</p>
+        </div>
+        <input type="button" id="getChromeExtension" style="width:100%; height:inherit" class="btn btn-primary" value="Get the Chrome Extension">
+      </div>
+      {% endif %}
     </div>
   </div>
-</div>
 </div>
 <script type="text/javascript">
 
@@ -80,3 +89,4 @@
 
 </script>
 {% endblock %}
+
