@@ -5,9 +5,7 @@ from flask import request, jsonify, render_template, url_for, redirect, flash
 
 show_canvas = True
 
-#display a saved version at /user/<uname>/<mname>
-#display an edit version at /user/<uname>/edit/<mname>
-@app.flask_app.route('/user/<uname>/cinjon/<mname>', methods=['GET'])
+@app.flask_app.route('/user/<uname>/<mname>', methods=['GET'])
 def user_mapping(uname, mname):
     u = app.models.kaizen_user.user_with_name(uname)
     if not u:
@@ -19,26 +17,20 @@ def user_mapping(uname, mname):
         flash('No mapping with name %s, should have 404ed' % mname)
         return redirect(url_for('user_profile', name=uname))
 
-    vis = app.models.mapping.visualize(m)
-    return render_template('user_mapping.html',
-                           show_canvas=json.dumps(show_canvas),
-                           mapping=json.dumps(vis))
-
-
-#TODO(Alex)
-@app.flask_app.route('/user/<uname>/alex/<mname>', methods=['GET'])
-def user_mapping_alex(uname, mname):
-    u = app.models.kaizen_user.user_with_name(uname)
-    if not u:
-        flash('No user with name %s, should have 404ed' % uname)
-        return app.views.index.go_to_index()
-
-    m = app.models.mapping.mapping_with_userid_and_name(u.id, mname)
-    if not m:
-        flash('No mapping with name %s, should have 404ed' % mname)
+    if not m.has_notes():
+        flash('This mapping has no notes')
         return redirect(url_for('user_profile', name=uname))
 
-    return render_template('user_mapping_alex.html', mapping=m)
+    sites = view_sites(m)
+    return render_template('user_mapping.html', mapping=m, sites=sites)
+
+#display a saved version at /user/<uname>/<mname>
+#display an edit version at /user/<uname>/edit/<mname>
+#     # TODO - Visualization.
+#     vis = app.models.mapping.visualize(m)
+#     return render_template('user_mapping.html',
+#                            show_canvas=json.dumps(show_canvas),
+#                            mapping=json.dumps(vis))
 
 @app.flask_app.route('/user/<uname>/edit/<mname>', methods=['GET'])
 @login_required
@@ -93,3 +85,6 @@ def name_site():
     #TODO(cinjon) do something with name here
     print 'in name_site, site_id: %s, new_name: %s' % (site_id, new_name)
     return jsonify(result=new_name)
+
+def view_sites(mapping):
+    return [{'name':str(s.short_title()), 'title':str(s.title), 'notes':s.notes_in_chrono_order()} for s in mapping.get_all_sites()]

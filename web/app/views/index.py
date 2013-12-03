@@ -25,21 +25,7 @@ def enter_index():
 
 
 def user_index():
-    #TODO
-    #This is going to show my maps on a sidebar as well as everyone's maps
-    #or friend's maps or some such on the main area
-    users = []
-    for u in kaizen_user.all_users_sorted_by_note_total():
-        if u.email == g.user.email:
-            continue
-        users.append({'name':u.name,
-                      'map_total':len(u.mappings.all()),
-                      'note_total':u.number_of_notes()})
-    mappings = []
-    for m in g.user.get_all_mappings_in_name_order():
-        mappings.append({'name':str(m.name), 'sites':len(m.get_all_sites()),
-                         'notes':len(m.get_all_notes())})
-    return render_template('global_index.html', users=users, mappings=mappings)
+    return redirect(url_for('user_profile_owner'))
 
 @flask_app.route('/google34d3fe92d155a2aa')
 @flask_app.route('/google34d3fe92d155a2aa.html')
