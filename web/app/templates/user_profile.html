@@ -48,7 +48,7 @@
                 <div class="span2 offset1">{{mapping.sites|length}} Sites</div>
                 <div class="span2">{{mapping.notes|length}} Notes</div>
                 {% if mapping.sites|length > 0 %}
-                <div class="pull-right" style="margin-right:15px"><a href="{{url_for('user_mapping', uname=user.name, mname=mapping.name)}}">Go to Map</a></div>
+                <div class="pull-right" style="margin-right:15px"><a href="{{url_for('user_mapping', name_route=user.name_route, map_name=mapping.name)}}">Go to Map</a></div>
                 {% endif %}
               </div>
             </div>

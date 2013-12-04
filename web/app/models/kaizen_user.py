@@ -29,12 +29,12 @@ class KaizenUser(app.db.Model, UserMixin):
 
     def __init__(self, name, email, password, roles, active):
         self.email = email
-        self.name = name
+        self.name = self.punctuate_name(name)
         self.active = active
         self.password = password
         self.creation_time = app.utility.get_time()
         self.roles = roles
-        self.name_route = self.set_name_route(name)
+        self.set_name_route(name)
 
     def is_authenticated(self):
         #Can the user be logged in in general?
@@ -55,7 +55,10 @@ class KaizenUser(app.db.Model, UserMixin):
         name = dashify_name(name)
         if count > 0:
             name = name + '-' + str(count)
-        return name
+        self.name_route = name
+
+    def punctuate_name(self, name):
+        return name.title()
 
     def check_password(self, password):
         return verify_and_update_password(password, self)

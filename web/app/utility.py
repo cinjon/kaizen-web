@@ -39,8 +39,10 @@ def xhr_response(data, code):
 
 def xhr_user_login(u, success):
     if success:
-        return xhr_response({'bindings':u.get_json_mappings(),
-                             'name':u.name}, 202)
+        data = {'name':u.name, 'nameRoute':u.name_route}
+        for binding, value in u.get_json_mappings().iteritems():
+            data['binding_' + str(binding)] = value
+        return xhr_response(data, 202)
     return xhr_response({}, 401)
 
 def xhr_user_register(u, success):

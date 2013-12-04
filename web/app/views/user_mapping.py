@@ -5,21 +5,21 @@ from flask import request, jsonify, render_template, url_for, redirect, flash
 
 show_canvas = True
 
-@app.flask_app.route('/user/<uname>/<mname>', methods=['GET'])
-def user_mapping(uname, mname):
-    u = app.models.kaizen_user.user_with_name(uname)
+@app.flask_app.route('/user/<name_route>/<map_name>', methods=['GET'])
+def user_mapping(name_route, map_name):
+    u = app.models.kaizen_user.user_with_name_route(name_route)
     if not u:
-        flash('No user with name %s, should have 404ed' % uname)
+        flash('No user with name %s, should have 404ed' % name_route)
         return app.views.index.go_to_index()
 
-    m = app.models.mapping.mapping_with_userid_and_name(u.id, mname)
+    m = app.models.mapping.mapping_with_userid_and_name(u.id, map_name)
     if not m:
-        flash('No mapping with name %s, should have 404ed' % mname)
-        return redirect(url_for('user_profile', name=uname))
+        flash('No mapping with name %s, should have 404ed' % map_name)
+        return redirect(url_for('user_profile', name_route=name_route))
 
     if not m.has_notes():
         flash('This mapping has no notes')
-        return redirect(url_for('user_profile', name=uname))
+        return redirect(url_for('user_profile', name_route=name_route))
 
     sites = view_sites(m)
     return render_template('user_mapping.html', mapping=m, sites=sites)
