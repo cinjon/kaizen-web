@@ -10,7 +10,7 @@
                  data-source='[{% for mapping in mappings %}&quot;{{mapping.name}}&quot;,{% endfor %}&quot;--&quot;]'
                  autocomplete="off" placeholder="Search your maps">
         </div>
-        {% if allmaps.notes %}
+        {% if allmaps.numMaps > 0 %}
         <div class="box">
           <ul class="nav nav-pills nav-stacked">
             <li class="active"><a href="#allmaps" data-toggle="tab">All</a></li>
@@ -22,14 +22,14 @@
         {% endif %}
       </div>
       <div class="span8">
-        {% if allmaps.notes %}
+        {% if allmaps.numMaps > 0 %}
         <div class="tab-content">
           <div id="allmaps" class="tab-pane active">
             <div class="smallbox">
               <div class="row-fluid">
                 <div class="span2 offset1"><p class="mapname">All</p></div>
-                <div class="span2 offset1">{{allmaps.sumSites}} Sites</div>
-                <div class="span2">{{allmaps.sumNotes}} Notes</div>
+                <div class="span2 offset1">{{allmaps.numSites}} Sites</div>
+                <div class="span2">{{allmaps.numNotes}} Notes</div>
               </div>
             </div>
             {% for note in allmaps.notes %}

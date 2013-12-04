@@ -31,8 +31,9 @@ def view_notes(u, n):
     return u.recent_notes(n)
 
 def summarize_maps(mappings):
-    ret = {'sumSites':0, 'sumNotes':0}
+    ret = {'numSites':0, 'numNotes':0, 'numMaps':0}
     for m in mappings:
-        ret['sumSites'] += len(m['sites'])
-        ret['sumNotes'] += len(m['notes'])
+        ret['numMaps'] += 1
+        ret['numSites'] += len(m['sites'])
+        ret['numNotes'] += len(m['notes'])
     return ret
