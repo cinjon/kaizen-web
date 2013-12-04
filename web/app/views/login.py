@@ -24,6 +24,8 @@ def ext_login():
     if request.is_xhr:
         email = request.form['email']
         password = request.form['password']
+        if email=='' and password=='' and g.user:
+            return app.utility.xhr_user_login(g.user, True)
         return app.models.kaizen_user.try_login(email, password, xhr=True)
 
 #only for the extension
@@ -35,7 +37,6 @@ def ext_register():
         first = request.form['email']
         last = request.form['email']
         return app.models.kaizen_user.try_register(email, password, first, last, xhr=True)
-
 
 #only for the extension
 @app.flask_app.route('/ext-logout')
