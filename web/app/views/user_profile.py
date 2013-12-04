@@ -14,9 +14,9 @@ def owner_profile():
 
 @flask_app.route('/user/<name_route>')
 @login_required
-def user_profile(name):
+def user_profile(name_route):
     if g.user and g.user.name_route == name_route:
-        return redirect(url_for('user_profile_owner'))
+        return redirect('/me')
 
     viewed = kaizen_user.user_with_name_route(name_route)
     if viewed:
