@@ -57,9 +57,6 @@ class KaizenUser(app.db.Model, UserMixin):
             name = name + '-' + str(count)
         self.name_route = name
 
-    def punctuate_name(self, name):
-        return name.title()
-
     def check_password(self, password):
         return verify_and_update_password(password, self)
 
@@ -170,3 +167,14 @@ def dashify_name(name):
     parts = [p for p in name.strip().split(' ') if not(p=='')]
     ret = '-'.join(parts).replace('.', '-')
     return ret
+
+def punctuate_string(s):
+    parts = []
+    for part in s.strip().split(' '):
+        if part == '':
+            continue
+        elif '.' in part:
+            parts.append('.'.join([period_part[0].capitalize() + period_part[1:] for period_part in part.strip('.').split('.')]))
+        else:
+            parts.append(part[0].capitalize() + part[1:])
+    return ' '.join(parts)
