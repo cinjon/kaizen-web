@@ -75,18 +75,17 @@
           <p>If you already have the extension, click on the little icon in the top right of your browser.</p>
           <p>If you don't have it, click the big blue button below to get it. Enjoy.</p>
         </div>
-        <input type="button" id="getChromeExtension" style="width:100%; height:inherit" class="btn btn-primary" value="Get the Chrome Extension">
+        <input type="button" id="getChromeExtension" style="width:100%; height:inherit" class="btn btn-primary" value="Get the Chrome Extension" onclick="window.open('https://chrome.google.com/webstore/detail/kaizen/nghglelhaloacojdomcgcgeenklfllag')">
       </div>
       {% endif %}
     </div>
   </div>
 </div>
-<script type="text/javascript">
 
+<script type="text/javascript">
     $('#mapTypeAhead').change(function(){
         window.location = '/user/{{ user.name }}/' + $(this).val();
     });
-
 </script>
 {% endblock %}
 
