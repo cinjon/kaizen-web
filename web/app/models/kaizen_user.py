@@ -29,7 +29,7 @@ class KaizenUser(app.db.Model, UserMixin):
 
     def __init__(self, name, email, password, roles, active):
         self.email = email
-        self.name = self.punctuate_name(name)
+        self.name = punctuate_string(name)
         self.active = active
         self.password = password
         self.creation_time = app.utility.get_time()
@@ -49,6 +49,9 @@ class KaizenUser(app.db.Model, UserMixin):
 
     def get_id(self):
         return unicode(self.id)
+
+    def first_name(self):
+        return self.name.split(' ')[0]
 
     def set_name_route(self, name):
         count = KaizenUser.query.filter(KaizenUser.name==name).count()

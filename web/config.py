@@ -27,6 +27,6 @@ SECURITY_MSG_USER_DOES_NOT_EXIST = ('That email is not these parts', 'error')
 SECURITY_MSG_INVALID_PASSWORD = ('That password was not right', 'error')
 SECURITY_MSG_PASSWORD_NOT_PROVIDED = ('Password por favor', 'error')
 SECURITY_MSG_EMAIL_NOT_PROVIDED = ('Email por favor', 'error')
-SECURITY_MSG_EMAIL_ALREADY_ASSOCIATED = ('We already know %(email).', 'error')
+SECURITY_MSG_EMAIL_ALREADY_ASSOCIATED = ('We already know %(email)s.', 'error')
 
 ADMINS = ['cinjon.resnick@gmail.com']
