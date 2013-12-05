@@ -6,17 +6,19 @@ class Mapping(app.db.Model):
     id = app.db.Column(app.db.Integer, primary_key=True)
     creation_time = app.db.Column(app.db.DateTime)
     name = app.db.Column(app.db.String(120))
+    name_route = app.db.Column(app.db.String(140))
     kaizen_user_id = app.db.Column(app.db.Integer, app.db.ForeignKey('kaizen_user.id'), index=True)
     binding = app.db.Column(app.db.SmallInteger)
     notes = app.db.relationship('Note', backref='mapping', lazy='dynamic')
     deleted = app.db.Column(app.db.Boolean)
 
     def __init__(self, name, kaizen_user_id, binding, deleted=False):
-        self.name = name
+        self.name = name.title()
         self.kaizen_user_id = kaizen_user_id
         self.binding = binding
         self.creation_time = app.utility.get_time()
         self.deleted = deleted
+        self.name_route = app.models.kaizen_user.dashify_name(self.name)
 
     def set_binding(self, binding):
         self.binding = binding
@@ -66,6 +68,12 @@ def json_mappings(maps):
 
 def mapping_with_userid_and_name(uid, name):
     filtered = Mapping.query.filter(and_(Mapping.name==name, Mapping.kaizen_user_id==uid)).all()
+    if len(filtered) == 1:
+        return filtered[0]
+    return None
+
+def mapping_with_userid_and_name_route(uid, name_route):
+    filtered = Mapping.query.filter(and_(Mapping.name_route==name_route, Mapping.kaizen_user_id==uid)).all()
     if len(filtered) == 1:
         return filtered[0]
     return None
