@@ -72,6 +72,9 @@ def unicode_replace(txt):
     txt.replace(u'\u2014', u'-')
     return txt
 
+def clean_ascii(txt):
+    return txt.encode('utf-8').decode('utf-8')
+
 def generate_id(size=6):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(size))
 

@@ -84,7 +84,7 @@
 
 <script type="text/javascript">
     $('#mapTypeAhead').change(function(){
-        window.location = '/user/{{ user.name }}/' + $(this).val();
+        window.location = '/user/{{ user.name_route }}/' + $(this).val();
     });
 </script>
 {% endblock %}

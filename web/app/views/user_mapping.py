@@ -40,13 +40,6 @@ def user_mapping_edit(uname, mname):
     vis = app.models.mapping.test_visualize("test mapping")
     return render_template('user_mapping.html', mapping=json.dumps(vis), show_canvas=json.dumps(True))
 
-@app.flask_app.route('/remove_index', methods=['GET'])
-@login_required
-def remove_index():
-    a = request.args.get('loopId', 0, type=int)
-    b = request.args.get('mapId', 0, type=int)
-    return jsonify(result=a + b)
-
 @app.flask_app.route('/reindex_note', methods=['GET'])
 @login_required
 def reindex_note():
@@ -74,7 +67,6 @@ def name_note():
     note_id = request.args.get('noteId', 0, type=int)
     new_name = request.args.get('newName', None, type=str)
     #TODO(cinjon) do something with name here
-    print 'in name_note, note_id: %s, new_name: %s' % (note_id, new_name)
     return jsonify(result=new_name)
 
 @app.flask_app.route('/name_site')
@@ -83,8 +75,7 @@ def name_site():
     site_id = request.args.get('siteId', 0, type=int)
     new_name = request.args.get('newName', None, type=str)
     #TODO(cinjon) do something with name here
-    print 'in name_site, site_id: %s, new_name: %s' % (site_id, new_name)
     return jsonify(result=new_name)
 
 def view_sites(mapping):
-    return [{'name':str(s.short_title()), 'title':str(s.title), 'notes':s.notes_in_chrono_order()} for s in mapping.get_all_sites()]
+    return [{'name':app.utility.clean_ascii(s.short_title()), 'title':app.utility.clean_ascii(s.title), 'notes':s.notes_in_chrono_order()} for s in mapping.get_all_sites()]
