@@ -35,6 +35,7 @@ class KaizenUser(app.db.Model, UserMixin):
         self.creation_time = app.utility.get_time()
         self.roles = roles
         self.set_name_route(name)
+        self.create_first_map('General')
 
     def is_authenticated(self):
         #Can the user be logged in in general?
@@ -122,6 +123,9 @@ class KaizenUser(app.db.Model, UserMixin):
                 app.models.note.Note.creation_time.desc()).limit(limit):
                 notes.append(n)
         return sorted(notes, key=lambda n: n.creation_time, reverse=True)[:limit]
+
+    def create_first_mapping(self, mapname):
+        app.models.mapping.create_mapping(self.id, mapname, 1)
 
     def __repr__(self):
         return self.name
