@@ -27,7 +27,7 @@
           <div id="allmaps" class="tab-pane active">
             <div class="smallbox">
               <div class="row-fluid">
-                <div class="span2 offset1"><p class="mapname">All</p></div>
+                <div class="span4 offset1"><p class="mapname">All</p></div>
                 <div class="span2 offset1">{{allmaps.numSites}} Sites</div>
                 <div class="span2">{{allmaps.numNotes}} Notes</div>
               </div>
@@ -44,11 +44,11 @@
           <div id="mapping{{loop.index}}" class="tab-pane">
             <div class="smallbox">
               <div class="row-fluid">
-                <div class="span2 offset1"><p class="mapname">{{mapping.name}}</p></div>
+                <div class="span4 offset1"><p class="mapname">{{mapping.name}}</p></div>
                 <div class="span2 offset1">{{mapping.sites|length}} Sites</div>
                 <div class="span2">{{mapping.notes|length}} Notes</div>
                 {% if mapping.sites|length > 0 %}
-                <div class="pull-right" style="margin-right:15px"><a href="{{url_for('user_mapping', name_route=user.name_route, map_name=mapping.name)}}">Go to Map</a></div>
+                <div class="pull-right" style="margin-right:15px"><a href="{{url_for('user_mapping', user_name_route=user.name_route, map_name_route=mapping.name_route)}}">See Map</a></div>
                 {% endif %}
               </div>
             </div>
