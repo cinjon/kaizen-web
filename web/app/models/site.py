@@ -21,8 +21,8 @@ class Site(app.db.Model):
         self.title = title
 
     def short_title(self):
-        if len(self.title) > 60:
-            return self.title[:57] + '...'
+        if len(self.title) > 40:
+            return self.title[:37] + '...'
         return self.title
 
     def notes_in_chrono_order(self):

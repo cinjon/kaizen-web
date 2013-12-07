@@ -17,7 +17,7 @@
                 {% else %}
               <li>
                 {% endif %}
-                <a href="#site{{loop.index}}" data-toggle="tab">{{site.name}}</a>
+                <a href="#site{{loop.index}}" data-toggle="tab">{{site.title}}</a>
               </li>
               {% endfor %}
             </ul>
@@ -34,7 +34,7 @@
               {% endif %}
               <div class="smallbox">
                 <div class="row-fluid">
-                  <div class="span8 offset1">
+                  <div class="span9 offset1">
                     <p class="mapname">{{site.title}}</p>
                   </div>
                   <div class="pull-right" style="margin-right:15px">{{site.notes|length}} Notes
@@ -56,4 +56,9 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block footer %}
+{{ super() }}
+<script src="/static/js/small_note_banner_plus.js"></script>
 {% endblock %}
