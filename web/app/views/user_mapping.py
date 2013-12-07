@@ -5,21 +5,26 @@ from flask import request, jsonify, render_template, url_for, redirect, flash
 
 show_canvas = True
 
-@app.flask_app.route('/user/<name_route>/<map_name>', methods=['GET'])
-def user_mapping(name_route, map_name):
-    u = app.models.kaizen_user.user_with_name_route(name_route)
+@app.flask_app.route('/user/<user_name_route>/<map_name_route>', methods=['GET'])
+def user_mapping(user_name_route, map_name_route):
+    u = app.models.kaizen_user.user_with_name_route(user_name_route)
     if not u:
-        flash('No user with name %s, should have 404ed' % name_route)
+        flash('No user with name %s, should have 404ed' % user_name_route)
         return app.views.index.go_to_index()
 
-    m = app.models.mapping.mapping_with_userid_and_name(u.id, map_name)
+    m = app.models.mapping.mapping_with_userid_and_name_route(u.id, map_name_route)
     if not m:
-        flash('No mapping with name %s, should have 404ed' % map_name)
-        return redirect(url_for('user_profile', name_route=name_route))
+        #lol, try seeing if it's the name too
+        m = app.models.mapping.mapping_with_userid_and_name(u.id, map_name_route)
+
+    if not m:
+        return redirect(url_for('404'))
+#         flash('No mapping with name %s, should have 404ed' % map_name_route)
+#         return redirect(url_for('user_profile', user_name_route=user_name_route))
 
     if not m.has_notes():
         flash('This mapping has no notes')
-        return redirect(url_for('user_profile', name_route=name_route))
+        return redirect(url_for('user_profile', name_route=user_name_route))
 
     sites = view_sites(m)
     return render_template('user_mapping.html', mapping=m, sites=sites)
@@ -78,4 +83,4 @@ def name_site():
     return jsonify(result=new_name)
 
 def view_sites(mapping):
-    return [{'name':app.utility.clean_ascii(s.short_title()), 'title':app.utility.clean_ascii(s.title), 'notes':s.notes_in_chrono_order()} for s in mapping.get_all_sites()]
+    return [{'name':app.utility.clean_ascii(s.short_title()), 'title':app.utility.clean_ascii(s.short_title()), 'notes':s.notes_in_chrono_order()} for s in mapping.get_all_sites()]
