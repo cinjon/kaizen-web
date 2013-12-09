@@ -7,6 +7,8 @@ from flask.ext.login import login_required
 @flask_app.route('/me', endpoint='me')
 @login_required
 def owner_profile():
+    if not g.user.has_mappings():
+        g.user.create_first_mapping('General')
     mappings = view_mappings(g.user)
     allmaps = summarize_maps(mappings)
     allmaps['notes'] = view_notes(g.user, 5)

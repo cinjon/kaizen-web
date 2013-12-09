@@ -36,7 +36,6 @@ class KaizenUser(app.db.Model, UserMixin):
         self.creation_time = app.utility.get_time()
         self.roles = roles
         self.set_name_route(name)
-        self.create_first_map('General')
 
     def is_authenticated(self):
         #Can the user be logged in in general?
@@ -70,6 +69,9 @@ class KaizenUser(app.db.Model, UserMixin):
             and_(
                 app.models.mapping.Mapping.binding > -1,
                 app.models.mapping.Mapping.deleted == False)).order_by(app.models.mapping.Mapping.binding)
+
+    def has_mappings(self):
+        return self.mappings.count() > 0
 
     def get_json_mappings(self):
         return app.models.mapping.json_mappings(self.get_current_mappings())
