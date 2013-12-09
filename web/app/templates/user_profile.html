@@ -54,10 +54,12 @@
             </div>
             {% if mapping.notes|length > 0 %}
             {% for note in mapping.notes %}
+            {% if loop.index < 5 %}
             <div class="box">
               {% set loop_index=loop.index %}
               {% include 'small_note_banner.html' %}
             </div>
+            {% endif %}
             {% endfor %}
             {% else %}
             <div class="box">
