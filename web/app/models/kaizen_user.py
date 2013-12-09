@@ -86,7 +86,7 @@ class KaizenUser(app.db.Model, UserMixin):
         return ret
 
     def get_all_live_mappings_in_notes_order(self):
-        return sorted(self.mappings.filter(app.models.mapping.Mapping.deleted==False), key=lambda m: len(m.get_all_live_notes()), reverse=True)
+        return sorted(self.mappings.filter(app.models.mapping.Mapping.deleted==False), key=lambda m: m.last_note_time(), reverse=True)
 
     def set_binding(self, binding, to_mapping):
         to_mapping = app.utility.decodeJS(to_mapping)
@@ -113,7 +113,7 @@ class KaizenUser(app.db.Model, UserMixin):
             m = self.mappings.filter(app.models.mapping.Mapping.binding == keyCode).first()
         elif 'mapping' in data:
             keyCode = -1 #reps ~
-            m = self.mappings.filter(app.models.mapping.Mapping.name == data['mapping']).first()
+            m = self.mappings.filter(app.models.mapping.Mapping.name == data['mapping']).first() or app.models.mapping.create_mapping(self.id, data['mapping'])
         else:
             m = None
 
@@ -127,9 +127,7 @@ class KaizenUser(app.db.Model, UserMixin):
     def recent_notes(self, limit=10):
         notes = []
         for m in self.mappings:
-            for n in m.notes.filter(
-                app.models.note.Note.deleted==False).order_by(
-                app.models.note.Note.creation_time.desc()).limit(limit):
+            for n in m.time_descending_notes(limit):
                 notes.append(n)
         return sorted(notes, key=lambda n: n.creation_time, reverse=True)[:limit]
 

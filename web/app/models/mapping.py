@@ -41,6 +41,16 @@ class Mapping(app.db.Model):
             return True
         return False
 
+    def time_descending_notes(self, limit=10):
+        return self.notes.filter(
+            app.models.note.Note.deleted==False).order_by(
+            app.models.note.Note.creation_time.desc()).limit(limit)
+
+    def last_note_time(self):
+        for n in self.time_descending_notes(1):
+            return n.creation_time
+        return app.utility.start_date
+
     def serialize(self, include_notes=False, include_user=False):
         ret = {'mid'   : self.id,
                'name' : self.name}
