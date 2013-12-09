@@ -11,9 +11,8 @@ $(function() {
                 console.log(mapHasSites);
 
                 if (!mapHasSites) {
-                    // Redirect to /me
-                }
-                if (siteNumNotes == 0) {
+                    window.location = "/me";
+                } else if (siteNumNotes == 0) {
                     // TODO(hide/remove site, activate a different one)
                 } else {
                     // hide/remove note, reduce # of notes in site
