@@ -19,8 +19,6 @@ def user_mapping(user_name_route, map_name_route):
 
     if not m:
         return redirect(url_for('404'))
-#         flash('No mapping with name %s, should have 404ed' % map_name_route)
-#         return redirect(url_for('user_profile', user_name_route=user_name_route))
 
     if not m.has_notes():
         flash('This mapping has no notes')
@@ -83,4 +81,4 @@ def name_site():
     return jsonify(result=new_name)
 
 def view_sites(mapping):
-    return [{'name':app.utility.clean_ascii(s.short_title()), 'title':app.utility.clean_ascii(s.short_title()), 'notes':s.notes_in_chrono_order()} for s in mapping.get_all_sites()]
+    return [{'name':app.utility.clean_ascii(s.short_title()), 'title':app.utility.clean_ascii(s.short_title()), 'id':s.id, 'notes':s.notes_in_chrono_order()} for s in mapping.get_all_live_sites()]

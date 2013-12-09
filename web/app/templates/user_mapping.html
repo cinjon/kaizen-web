@@ -13,11 +13,11 @@
             <ul class="nav nav-pills nav-stacked">
               {% for site in sites %}
               {% if loop.first %}
-              <li class="active">
+              <li id="li{{site.id}}" class="active">
                 {% else %}
-              <li>
+              <li id="li{{site.id}}">
                 {% endif %}
-                <a href="#site{{loop.index}}" data-toggle="tab">{{site.title}}</a>
+                <a href="#sid{{site.id}}" data-toggle="tab">{{site.title}}</a>
               </li>
               {% endfor %}
             </ul>
@@ -28,29 +28,25 @@
         <div class="tab-content">
           {% for site in sites %}
           {% if loop.first %}
-          <div id="site{{loop.index}}" class="tab-pane active">
-            {% else %}
-            <div id="site{{loop.index}}" class="tab-pane">
-              {% endif %}
-              <div class="smallbox">
-                <div class="row-fluid">
-                  <div class="span9 offset1">
-                    <p class="mapname">{{site.title}}</p>
-                  </div>
-                  <div class="pull-right" style="margin-right:15px">{{site.notes|length}} Notes
-                  </div>
+          <div id="sid{{site.id}}" class="tab-pane active">{% else %}<div id="sid{{site.id}}" class="tab-pane">{% endif %}
+            <div class="smallbox">
+              <div class="row-fluid">
+                <div class="span9 offset1">
+                  <p class="mapname"></p>
+                </div>
+                <div class="pull-right numNotes" style="margin-right:15px">{{site.notes|length}} Notes
                 </div>
               </div>
-              {% for note in site.notes %}
-              <div class="box">
-                {% set loop_index=loop.index %}
-                {% set mapping=mapping %}
-                {% include 'small_note_banner_plus.html' %}
-              </div>
-              {% endfor %}
+            </div>
+            {% for note in site.notes %}
+            <div class="box noteBanner">
+              {% set loop_index=loop.index %}
+              {% set mapping=mapping %}
+              {% include 'small_note_banner_plus.html' %}
             </div>
             {% endfor %}
           </div>
+        {% endfor %}
         </div>
       </div>
     </div>

@@ -25,7 +25,7 @@ def user_profile(name_route):
     return redirect(url_for('404'))
 
 def view_mappings(u):
-    return [{'name':str(m.name), 'notes':m.get_all_notes(), 'sites':m.get_all_sites()} for m in u.get_all_mappings_in_notes_order()]
+    return [{'name':str(m.name), 'notes':m.get_all_live_notes(), 'sites':m.get_all_live_sites()} for m in u.get_all_live_mappings_in_notes_order()]
 
 def view_notes(u, n):
     return u.recent_notes(n)

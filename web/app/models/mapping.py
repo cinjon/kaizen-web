@@ -30,14 +30,14 @@ class Mapping(app.db.Model):
         href = app.utility.decodeJS(data['href'])
         app.models.note.create_note(text, title, href, self.id, keyCode)
 
-    def get_all_notes(self):
-        return [n for n in self.notes]
+    def get_all_live_notes(self):
+        return [n for n in self.notes if n.deleted==False]
 
-    def get_all_sites(self):
-        return list(set([n.site for n in self.notes]))
+    def get_all_live_sites(self):
+        return list(set([n.site for n in self.notes if n.deleted==False]))
 
     def has_notes(self):
-        for n in self.notes:
+        for n in self.notes.filter(app.models.note.Note.deleted==False):
             return True
         return False
 
@@ -108,7 +108,7 @@ def visualize_from_null(m):
                                             node_type_id=m.id)
     ret['root'] = root_node.serialize()
 
-    sites = m.get_all_sites()
+    sites = m.get_all_live_sites()
     if len(sites) == 0:
         return ret
     else:

@@ -26,7 +26,8 @@ class Site(app.db.Model):
         return self.title
 
     def notes_in_chrono_order(self):
-        return [n for n in self.notes.order_by(app.models.note.Note.creation_time.desc())]
+        return [n for n in self.get_all_live_notes().order_by(
+            app.models.note.Note.creation_time.desc())]
 
     def serialize(self):
         return {'sid'           : self.id,
@@ -35,8 +36,21 @@ class Site(app.db.Model):
                 'name'          : self.name,
                 'creation_time' : app.utility.serialize_datetime(self.creation_time)}
 
-    def delete(self):
+    def has_notes(self):
+        for n in self.notes.filter(app.models.note.Note.deleted==False):
+            return True
+        return False
+
+    def num_notes(self):
+        return self.get_all_live_notes().count()
+
+    def get_all_live_notes(self):
+        return self.notes.filter(app.models.note.Note.deleted==False)
+
+    def delete(self, defer=False):
         self.deleted = True
+        if not defer:
+            app.models.sql.commit()
 
 def create_site(url, title):
     site = Site(url, title)

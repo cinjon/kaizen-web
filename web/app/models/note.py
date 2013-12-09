@@ -51,8 +51,12 @@ class Note(app.db.Model):
             return title[:57] + '...'
         return title
 
-    def delete(self):
+    def delete(self, defer=False):
         self.deleted = True
+        if not self.site.has_notes():
+            self.site.delete(defer=True)
+        if not defer:
+            app.models.sql.commit()
 
     def __unicode__(self):
         if len(self.text) > 50:

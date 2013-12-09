@@ -2,13 +2,13 @@
   <div class="box-wrapper" >
     <div class="box shadow-box">
       <div class="controls-wrapper highcontrols-wrapper">
-        <input class="loopId" type="hidden" value="{{ note.id }}"/>
+        <input class="noteId" type="hidden" value="{{ note.id }}" id="nid{{note.id}}"/>
         <input class="mapId" type="hidden" value="{{ mapping.id }}"/>
         <div class="row-fluid margin-bottom">
           <div class="span12">
             <span class="pull-right">
               <em><small class="muted">{{ note.creation_time.strftime('%Y-%m-%d') }}</small></em>
-              <a class="btn-small removeNote" href="#"><i class="icon-remove"></i></a>
+              <a class="btn-small removeNote" href="#" url="{{url_for('delete_note')}}"><i class="icon-remove"></i></a>
             </span>
           </div>
         </div>

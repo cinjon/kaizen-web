@@ -4,6 +4,7 @@ from flask.ext.login import login_user
 from flask.ext.security.utils import verify_and_update_password
 from flask.ext.security import UserMixin
 from app.models.role import roles_users
+from sqlalchemy import and_
 
 ROLE_USER = 0
 ROLE_ADMIN = 1
@@ -65,19 +66,25 @@ class KaizenUser(app.db.Model, UserMixin):
         return verify_and_update_password(password, self)
 
     def get_current_mappings(self):
-        return self.mappings.filter(app.models.mapping.Mapping.binding > -1).order_by(app.models.mapping.Mapping.binding)
+        return self.mappings.filter(
+            and_(
+                app.models.mapping.Mapping.binding > -1,
+                app.models.mapping.Mapping.deleted == False)).order_by(app.models.mapping.Mapping.binding)
 
     def get_json_mappings(self):
         return app.models.mapping.json_mappings(self.get_current_mappings())
 
-    def get_all_mappings_in_name_order(self):
+    def get_all_live_mappings_in_name_order(self):
         #Display mappings, with bound ones first
         ret = self.get_current_mappings().all()
-        [ret.append(m) for m in self.mappings.filter(app.models.mapping.Mapping.binding < 0).order_by(app.models.mapping.Mapping.name)]
+        [ret.append(m) for m in self.mappings.filter(
+            and_(
+                app.models.mapping.Mapping.deleted==False,
+                app.models.mapping.Mapping.binding < 0)).order_by(app.models.mapping.Mapping.name)]
         return ret
 
-    def get_all_mappings_in_notes_order(self):
-        return sorted(self.mappings, key=lambda m: len(m.get_all_notes()), reverse=True)
+    def get_all_live_mappings_in_notes_order(self):
+        return sorted(self.mappings.filter(app.models.mapping.Mapping.deleted==False), key=lambda m: len(m.get_all_live_notes()), reverse=True)
 
     def set_binding(self, binding, to_mapping):
         to_mapping = app.utility.decodeJS(to_mapping)
@@ -119,7 +126,7 @@ class KaizenUser(app.db.Model, UserMixin):
         notes = []
         for m in self.mappings:
             for n in m.notes.filter(
-                not(app.models.note.Note.text == '')).order_by(
+                app.models.note.Note.deleted==False).order_by(
                 app.models.note.Note.creation_time.desc()).limit(limit):
                 notes.append(n)
         return sorted(notes, key=lambda n: n.creation_time, reverse=True)[:limit]
