@@ -21,6 +21,7 @@
           <a class="brand" href="{{ url_for('index') }}">Kaizen</a>
           <a class="brand" href="{{ url_for('index') }}" style="margin-left:2px; font-size:small">towards continuous improvement</a>
           {% if g.user %}
+          <a class="brand" href="{{ url_for('new_features') }}" style="font-size:15px; margin-left:65px">New Features</a>
           <ul class="nav pull-right">
             <li><a href="/me">{{g.user.name}}</a></li>
             <li><a href="{{ url_for_security('logout') }}">Logout</a></li>
