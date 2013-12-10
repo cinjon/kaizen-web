@@ -6,6 +6,7 @@ from flask import request, jsonify, render_template, url_for, redirect, flash
 show_canvas = True
 
 @app.flask_app.route('/user/<user_name_route>/<map_name_route>', methods=['GET'])
+@login_required
 def user_mapping(user_name_route, map_name_route):
     u = app.models.kaizen_user.user_with_name_route(user_name_route)
     if not u:
@@ -18,7 +19,7 @@ def user_mapping(user_name_route, map_name_route):
         m = app.models.mapping.mapping_with_userid_and_name(u.id, map_name_route)
 
     if not m:
-        return redirect(url_for('404'))
+        return redirect('/me')
 
     if not m.has_notes():
         flash('This mapping has no notes')
