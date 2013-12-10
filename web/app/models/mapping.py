@@ -80,17 +80,13 @@ def mapping_with_userid(uid):
     return Mapping.query.filter(Mapping.kaizen_user_id==uid).all()
 
 def mapping_with_userid_and_name(uid, name):
-    if not name:
-        return None
-    filtered = [m for m in mapping_with_userid(uid) if m.name.lower() == name.lower()]
+    filtered = [m for m in mapping_with_userid(uid) if m.name and  m.name.lower() == name.lower()]
     if len(filtered) == 1:
         return filtered[0]
     return None
 
 def mapping_with_userid_and_name_route(uid, name_route):
-    if not name_route:
-        return None
-    filtered = [m for m in mapping_with_userid(uid) if m.name_route.lower() == name_route.lower()]
+    filtered = [m for m in mapping_with_userid(uid) if m.name_route and m.name_route.lower() == name_route.lower()]
     if len(filtered) == 1:
         return filtered[0]
     return None
