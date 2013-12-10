@@ -76,14 +76,17 @@ def json_mappings(maps):
         ret[m.binding] = m.name
     return ret
 
+def mapping_with_userid(uid):
+    return Mapping.query.filter(Mapping.kaizen_user_id==uid).all()
+
 def mapping_with_userid_and_name(uid, name):
-    filtered = Mapping.query.filter(and_(Mapping.name==name, Mapping.kaizen_user_id==uid)).all()
+    filtered = [m for m in mapping_with_userid(uid) if m.name.lower() == name.lower()]
     if len(filtered) == 1:
         return filtered[0]
     return None
 
 def mapping_with_userid_and_name_route(uid, name_route):
-    filtered = Mapping.query.filter(and_(Mapping.name_route==name_route, Mapping.kaizen_user_id==uid)).all()
+    filtered = [m for m in mapping_with_userid(uid) if m.name_route.lower() == name_route.lower()]
     if len(filtered) == 1:
         return filtered[0]
     return None
