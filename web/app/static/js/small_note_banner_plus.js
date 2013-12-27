@@ -7,8 +7,6 @@ $(function() {
                 var noteId = data.noteId;
                 var siteNumNotes = data.siteNumNotes;
                 var mapHasSites = data.mapHasSites;
-                console.log(siteNumNotes);
-                console.log(mapHasSites);
 
                 if (!mapHasSites) {
                     window.location = "/me";
